@@ -1,0 +1,10 @@
+Planned features:
+(! means that a feature is REQUIRED)
+- ! quad_window (Window management and events, ref bevy_window)
+- ! quad_input (Input types, ref bevy_input)
+- quad_render (Basic pipeline for rendering, ref bevy_render)
+- quad_core_pipeline (Actual rendering)
+- quad_sprite (Sprite rendering, ref bevy_sprite)
+- quad_text (Text rendering, ref bevy_text)
+- quad_audio (Audio functionality, ref bevy_audio)
+- quad_ui (GUI from macroquad, ref bevy_ui but is mostly its own thing)
