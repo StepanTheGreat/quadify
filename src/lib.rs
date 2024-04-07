@@ -2,9 +2,15 @@
 // ! uses bevy's parallel processing plugin. Macroquad is designed to work on a single thread, thus
 // ! there needs to be some sort of isolation for ALL of its functionality.
 
-use bevy::{a11y::AccessibilityPlugin, app::PluginGroupBuilder, diagnostic::DiagnosticsPlugin, input::InputPlugin, log::LogPlugin, prelude::*, time::TimePlugin};
-use macroquad::prelude::*;
-
+use bevy::{
+    a11y::AccessibilityPlugin, 
+    app::PluginGroupBuilder, 
+    diagnostic::DiagnosticsPlugin, 
+    input::InputPlugin, 
+    log::LogPlugin, 
+    prelude::*, 
+    time::TimePlugin
+};
 pub use macroquad;
 use window::MQWindowPlugin; // Only import it if you actually need it
 // use sprite::RenderingPlugin;

@@ -7,13 +7,13 @@ mod converter;
 
 /// Macroquad window integration plugin (doesn't support multiple windows).
 pub struct MQWindowPlugin {
-    /// Macroquad's high-dpi option
-    high_dpi: bool
+    /// Macroquad's high-dpi option, for now with no use
+    _high_dpi: bool
 }
 impl Default for MQWindowPlugin {
     fn default() -> Self {
         Self {
-            high_dpi: false
+            _high_dpi: false
         }
     }
 }
