@@ -1,4 +1,5 @@
-// ? This plugin is an abstraction over macroquad's textures
+/// This plugin is an abstraction over macroquad's textures
+/// Don't be scared, because it's my first prototype. In the future I'm planning to change it.
 
 use bevy::prelude::*;
 use macroquad::prelude::*;
