@@ -1,5 +1,4 @@
 /// Converts macroquad types to bevy types
-
 use bevy::input as bevy_input;
 use macroquad::input as mq_input;
 
@@ -9,15 +8,15 @@ use bevy_input::mouse::MouseButton as BMouseButton;
 use mq_input::KeyCode as MKeyCode;
 use mq_input::MouseButton as MMouseButton;
 
-use macroquad::miniquad::TouchPhase as MTouchPhase;
 use bevy_input::touch::TouchPhase as BTouchPhase;
+use macroquad::miniquad::TouchPhase as MTouchPhase;
 
 pub fn mq_to_bevy_tch(tch: MTouchPhase) -> BTouchPhase {
     match tch {
         MTouchPhase::Cancelled => BTouchPhase::Canceled,
         MTouchPhase::Ended => BTouchPhase::Ended,
         MTouchPhase::Moved => BTouchPhase::Moved,
-        MTouchPhase::Started => BTouchPhase::Started
+        MTouchPhase::Started => BTouchPhase::Started,
     }
 }
 
@@ -26,7 +25,7 @@ pub fn mq_to_bevy_mbtn(mbtn: MMouseButton) -> BMouseButton {
         MMouseButton::Left => BMouseButton::Left,
         MMouseButton::Right => BMouseButton::Right,
         MMouseButton::Middle => BMouseButton::Middle,
-        MMouseButton::Unknown => BMouseButton::Other(3) // ! Magic number
+        MMouseButton::Unknown => BMouseButton::Other(3), // ! Magic number
     }
 }
 
