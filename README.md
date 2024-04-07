@@ -31,3 +31,7 @@ I believe the platform support will be the same as macroquad's, so users might h
 ## Licensing
 
 I'm leaving the same MIT and APACHE licenses from both projects for you to choose.
+
+## Contribution
+
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you, as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
