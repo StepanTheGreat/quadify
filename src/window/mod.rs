@@ -1,69 +1,61 @@
-use bevy::window::*;
-use bevy::{
-    app::{AppExit, PluginsState},
-    prelude::*,
-};
-use macroquad::prelude::{next_frame, Conf};
+use miniquad::{window, EventHandler};
+use miniquad::conf::Conf;
+use miniquad::RenderingBackend;
 
-mod converter;
-mod events;
+use bevy_app::{App, PreStartup, Plugin};
 
-/// Macroquad window integration plugin (doesn't support multiple windows).
-pub struct MQWindowPlugin {
-    /// Macroquad's high-dpi option, for now with no use
-    _high_dpi: bool,
+/// General `miniquad` state handler for the entire app. It stores bevy's [`App`], manages its event loop and so on 
+struct QuadState {
+    app: App
 }
-impl Default for MQWindowPlugin {
+
+impl EventHandler for QuadState {
+    fn update(&mut self) {}
+
+    fn draw(&mut self) {
+        // ! Updating the entire app here for now, but in the future there should be 2 different schedules for both `update` and `draw`
+        self.app.update();
+    }
+}
+
+/// Miniquad window and main loop runner plugin
+pub struct WindowPlugin {
+    pub title: String,
+    pub width: i32, 
+    pub height: i32,
+    pub fullscreen: bool,
+    pub high_dpi: bool
+}
+
+impl Default for WindowPlugin {
     fn default() -> Self {
-        Self { _high_dpi: false }
+        let conf = Conf::default(); 
+
+        Self { 
+            title: conf.window_title,
+            width: conf.window_width,
+            height: conf.window_height,
+            fullscreen: conf.fullscreen,
+            high_dpi: conf.high_dpi
+        }
     }
 }
 
-impl Plugin for MQWindowPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(PreStartup, events::init_events)
-            .add_systems(PreUpdate, events::get_events)
-            .set_runner(macro_runner);
-    }
-}
-
-fn macro_runner(mut app: App) {
-    if app.plugins_state() != PluginsState::Ready {
-        app.finish();
-        app.cleanup();
-    }
-
-    let mut wconf = Conf::default();
-    for window in app
-        .world
-        .query_filtered::<&Window, With<PrimaryWindow>>()
-        .iter(&app.world)
-    {
-        wconf = Conf {
-            window_title: window.title.clone(),
-            window_resizable: window.resizable,
-            window_width: window.width() as i32,
-            window_height: window.height() as i32,
-            high_dpi: true, // ! There's no way to change this
-            fullscreen: match window.mode {
-                WindowMode::Windowed => false,
-                WindowMode::Fullscreen
-                | WindowMode::BorderlessFullscreen
-                | WindowMode::SizedFullscreen => true,
-            },
+impl Plugin for WindowPlugin {
+    fn build(&self, app: &mut App) {        
+        let conf: Conf = Conf {
+            window_title: self.title.clone(),
+            window_width: self.width,
+            window_height: self.height,
+            fullscreen: self.fullscreen,
+            high_dpi: self.high_dpi,
             ..Default::default()
         };
-    }
 
-    macroquad::Window::from_config(wconf, async move {
-        loop {
-            if let Some(events) = app.world.get_resource::<Events<AppExit>>() {
-                if !events.is_empty() {
-                    break;
-                }
-            }
-            app.update();
-            next_frame().await;
-        }
-    });
+        app.set_runner(move |app| miniquad_runner(app, conf));
+    }
+}
+
+fn miniquad_runner(app: App, conf: Conf) {
+    miniquad::start(conf, move || Box::new(QuadState { app }));
 }
