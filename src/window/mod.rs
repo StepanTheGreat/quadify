@@ -1,8 +1,21 @@
+use bevy_ecs::world::World;
 use miniquad::{window, EventHandler};
 use miniquad::conf::Conf;
 use miniquad::RenderingBackend;
-
 use bevy_app::{App, PreStartup, Plugin};
+
+/// Miniquad rendering backend object. Initialize ONLY after [`miniquad::start`]
+pub struct Graphics {
+    pub backend: Box<dyn RenderingBackend>
+}
+
+impl Graphics {
+    pub fn new() -> Self {
+        Self {
+            backend: window::new_rendering_backend()
+        }
+    }
+}
 
 /// General `miniquad` state handler for the entire app. It stores bevy's [`App`], manages its event loop and so on 
 struct QuadState {
@@ -27,10 +40,22 @@ pub struct WindowPlugin {
     pub high_dpi: bool
 }
 
+impl WindowPlugin {
+    fn conf(&self) -> Conf {
+        Conf {
+            window_title: self.title.clone(),
+            window_width: self.width,
+            window_height: self.height,
+            fullscreen: self.fullscreen,
+            high_dpi: self.high_dpi,
+            ..Default::default()
+        }
+    }
+}
+
 impl Default for WindowPlugin {
     fn default() -> Self {
         let conf = Conf::default(); 
-
         Self { 
             title: conf.window_title,
             width: conf.window_width,
@@ -43,19 +68,17 @@ impl Default for WindowPlugin {
 
 impl Plugin for WindowPlugin {
     fn build(&self, app: &mut App) {        
-        let conf: Conf = Conf {
-            window_title: self.title.clone(),
-            window_width: self.width,
-            window_height: self.height,
-            fullscreen: self.fullscreen,
-            high_dpi: self.high_dpi,
-            ..Default::default()
-        };
-
-        app.set_runner(move |app| miniquad_runner(app, conf));
+        let conf: Conf = self.conf();
+        app
+            .add_systems(PreStartup, init_backend)
+            .set_runner(move |app| miniquad_runner(app, conf));
     }
 }
 
 fn miniquad_runner(app: App, conf: Conf) {
     miniquad::start(conf, move || Box::new(QuadState { app }));
+}
+
+fn init_backend(w: &mut World) {
+    w.insert_non_send_resource(Graphics::new());
 }
