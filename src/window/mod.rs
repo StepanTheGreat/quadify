@@ -1,8 +1,7 @@
-use bevy_ecs::world::World;
 use miniquad::{window, EventHandler};
 use miniquad::conf::Conf;
 use miniquad::RenderingBackend;
-use bevy_app::{App, PreStartup, Plugin};
+use bevy_app::{App, Plugin};
 
 /// Miniquad rendering backend object. Initialize ONLY after [`miniquad::start`]
 pub struct Graphics {
@@ -69,16 +68,13 @@ impl Default for WindowPlugin {
 impl Plugin for WindowPlugin {
     fn build(&self, app: &mut App) {        
         let conf: Conf = self.conf();
-        app
-            .add_systems(PreStartup, init_backend)
-            .set_runner(move |app| miniquad_runner(app, conf));
+        app.set_runner(move |app| miniquad_runner(app, conf));
     }
 }
 
-fn miniquad_runner(app: App, conf: Conf) {
-    miniquad::start(conf, move || Box::new(QuadState { app }));
-}
-
-fn init_backend(w: &mut World) {
-    w.insert_non_send_resource(Graphics::new());
+fn miniquad_runner(mut app: App, conf: Conf) {
+    miniquad::start(conf, move || {
+        app.insert_non_send_resource(Graphics::new());
+        Box::new(QuadState { app })
+    });
 }
