@@ -3,8 +3,7 @@
 // ! there needs to be some sort of isolation for ALL of its functionality.
 
 use bevy_app::{PluginGroup, PluginGroupBuilder};
-use window::WindowPlugin; // Only import it if you actually need it
-                            // use sprite::RenderingPlugin;
+use window::WindowPlugin;
 
 pub mod prelude;
 pub mod window;
