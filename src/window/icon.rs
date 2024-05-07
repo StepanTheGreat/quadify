@@ -6,25 +6,35 @@ use std::io;
 pub struct WindowIcon(image::DynamicImage);
 
 impl WindowIcon {
-	/// Load an icon from a file path
-	pub fn from_path<A: AsRef<str>, F: Fn(Result<WindowIcon, fs::Error>) + 'static>(path: A, callback: F) {
+	/// Load an icon from filesystem on Desktop and Fetch on Web
+	pub fn from_file<A: AsRef<str>, F: Fn(Result<WindowIcon, fs::Error>) + 'static>(path: A, callback: F, format: Option<image::ImageFormat>) {
 		fs::load_file(path.as_ref(), move |res| match res {
 			// File was unable to load
 			Err(e) => callback(Err(e)),
-			Ok(data) => callback(WindowIcon::from_bytes(&data)),
+			Ok(data) => callback(WindowIcon::from_bytes(&data, format)),
 		});
 	}
 
-	/// Load an icon from a byte array
-	pub fn from_bytes(data: &[u8]) -> Result<WindowIcon, fs::Error> {
+	/// Load an icon from a byte slice
+	pub fn from_bytes(data: &[u8], format: Option<image::ImageFormat>) -> Result<WindowIcon, fs::Error> {
 		let data = io::Cursor::new(data);
-		let reader = image::io::Reader::new(data).with_guessed_format().map_err(fs::Error::IOError)?;
+
+		let reader = match format {
+			Some(f) => {
+				let mut reader = image::io::Reader::new(data);
+				reader.set_format(f);
+				reader
+			}
+			None => image::io::Reader::new(data).with_guessed_format().map_err(fs::Error::IOError)?,
+		};
+
 		let img = reader.decode().map_err(|_| fs::Error::IOSAssetNoData)?;
 
 		Ok(WindowIcon(img))
 	}
 }
 
+/// Given an image, downsample it to a smaller size and decode it into a byte array.
 fn downsample<const T: usize, const W: usize>(img: &DynamicImage) -> Option<[u8; T]> {
 	let height = T / W;
 	let thumbnail = img.thumbnail(W as _, height as _);

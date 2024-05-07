@@ -5,7 +5,12 @@
 use bevy_app::{PluginGroup, PluginGroupBuilder};
 use window::WindowPlugin;
 
-pub mod prelude;
+pub mod prelude {
+	pub use crate::window::*;
+	pub use crate::QuadifyPlugins;
+	pub use miniquad;
+}
+
 pub mod window;
 
 /// QuadifyPlugins is a custom made [`DefaultPlugins`] bundle

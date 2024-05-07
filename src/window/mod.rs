@@ -8,6 +8,15 @@ mod icon;
 /// Miniquad rendering backend object. Initialize ONLY after [`miniquad::start`]
 pub struct RenderingBackend(Box<dyn MqdRenderingBackend>);
 
+// For ease of use
+impl std::ops::Deref for RenderingBackend {
+	type Target = dyn MqdRenderingBackend;
+
+	fn deref(&self) -> &Self::Target {
+		&*self.0
+	}
+}
+
 impl RenderingBackend {
 	pub fn new() -> Self {
 		Self(window::new_rendering_backend())
@@ -34,6 +43,7 @@ pub struct WindowPlugin {
 	pub height: i32,
 	pub fullscreen: bool,
 	pub high_dpi: bool,
+	pub window_resizable: bool,
 	pub icon: Option<icon::WindowIcon>,
 }
 
@@ -47,6 +57,7 @@ impl Default for WindowPlugin {
 			height: conf.window_height,
 			fullscreen: conf.fullscreen,
 			high_dpi: conf.high_dpi,
+			window_resizable: conf.window_resizable,
 			icon: None,
 		}
 	}
@@ -61,19 +72,19 @@ impl Plugin for WindowPlugin {
 		conf.window_height = self.height;
 		conf.fullscreen = self.fullscreen;
 		conf.high_dpi = self.high_dpi;
+		conf.window_resizable = self.window_resizable;
 
 		if let Some(icon) = &self.icon {
 			// TODO: Log when Icon conversion fails
 			conf.icon = icon.try_into().ok();
 		}
 
-		app.set_runner(move |app| miniquad_runner(app, conf));
-	}
-}
-
-fn miniquad_runner(mut app: App, conf: Conf) {
-	miniquad::start(conf, move || {
+		// Insert Resources here
 		app.insert_non_send_resource(RenderingBackend::new());
-		Box::new(QuadState { app })
-	});
+
+		// Init Runner
+		app.set_runner(move |app| {
+			miniquad::start(conf, move || Box::new(QuadState { app: app }));
+		});
+	}
 }
