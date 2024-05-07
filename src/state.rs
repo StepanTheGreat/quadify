@@ -1,5 +1,5 @@
 use bevy_app::*;
-use bevy_ecs::schedule::{ExecutorKind, Schedule, ScheduleLabel};
+use bevy_ecs::schedule::ScheduleLabel;
 use miniquad::EventHandler;
 
 /// General `miniquad` state handler for the entire app. It stores bevy's [`App`], manages its event loop and so on
@@ -34,23 +34,7 @@ pub(crate) struct StatePlugin;
 
 impl bevy_app::Plugin for StatePlugin {
 	fn build(&self, app: &mut App) {
-		// Similar to bevy's default schedule, but with a few modifications
-		let mut main_schedule = Schedule::new(Main);
-		main_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
-		let mut fixed_main_schedule = Schedule::new(FixedMain);
-		fixed_main_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
-		let mut fixed_main_loop_schedule = Schedule::new(RunFixedMainLoop);
-		fixed_main_loop_schedule.set_executor_kind(ExecutorKind::SingleThreaded);
-
-		app.add_schedule(main_schedule)
-			.add_schedule(fixed_main_schedule)
-			.add_schedule(fixed_main_loop_schedule)
-			.init_resource::<MainScheduleOrder>()
-			.init_resource::<FixedMainScheduleOrder>()
-			.add_systems(Main, Main::run_main)
-			.add_systems(FixedMain, FixedMain::run_fixed_main);
-
-		// Draw is called conditionally, therefore systems added to the [`MiniquadDraw`] schedule need to be called conditionally from within the [`QuadifyState::draw`] method
+		app.add_plugins(MainSchedulePlugin);
 		app.init_schedule(MiniquadDraw);
 	}
 }

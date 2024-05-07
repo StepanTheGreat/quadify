@@ -1,5 +1,5 @@
 use bevy_app::{App, Plugin};
-use miniquad::conf::Conf;
+use miniquad::conf::{Conf, Platform};
 
 use crate::state::QuadifyState;
 
@@ -14,6 +14,8 @@ pub struct WindowPlugin {
 	pub high_dpi: bool,
 	pub window_resizable: bool,
 	pub icon: Option<icon::WindowIcon>,
+	/// Platform specific settings. See [`miniquad::conf::Platform`]
+	pub platform: Option<Platform>,
 }
 
 impl Default for WindowPlugin {
@@ -28,6 +30,7 @@ impl Default for WindowPlugin {
 			high_dpi: conf.high_dpi,
 			window_resizable: conf.window_resizable,
 			icon: None,
+			platform: None,
 		}
 	}
 }

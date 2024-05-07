@@ -2,7 +2,7 @@ use image::DynamicImage;
 use miniquad::{conf::Icon, fs};
 use std::io;
 
-/// More ergonomic interface to [`Icon`].
+/// Ergonomic interface to [`Icon`].
 pub struct WindowIcon(image::DynamicImage);
 
 impl WindowIcon {
