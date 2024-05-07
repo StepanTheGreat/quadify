@@ -11,9 +11,8 @@ pub mod window;
 /// QuadifyPlugins is a custom made [`DefaultPlugins`] bundle
 pub struct QuadifyPlugins;
 impl PluginGroup for QuadifyPlugins {
-    fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>()
-            .add(WindowPlugin::default())
-        // ? For now removed all other plugins to focus on miniquad
-    }
+	fn build(self) -> PluginGroupBuilder {
+		PluginGroupBuilder::start::<Self>().add(WindowPlugin::default())
+		// ? For now removed all other plugins to focus on miniquad
+	}
 }
