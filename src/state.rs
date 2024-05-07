@@ -25,7 +25,7 @@ impl EventHandler for QuadifyState {
 	}
 
 	fn draw(&mut self) {
-		let _ = self.app.world.run_schedule(MiniquadDraw);
+		self.app.world.run_schedule(MiniquadDraw);
 	}
 }
 

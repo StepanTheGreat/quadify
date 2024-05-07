@@ -29,7 +29,6 @@ impl WindowIcon {
 		};
 
 		let img = reader.decode().map_err(|_| fs::Error::IOSAssetNoData)?;
-
 		Ok(WindowIcon(img))
 	}
 }

@@ -8,6 +8,9 @@ pub mod prelude {
 	pub use miniquad;
 }
 
+#[cfg(test)]
+mod tests;
+
 pub mod render;
 pub mod state;
 pub mod window;
