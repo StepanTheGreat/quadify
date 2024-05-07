@@ -1,42 +1,11 @@
 use bevy_app::{App, Plugin};
 use miniquad::conf::Conf;
-use miniquad::RenderingBackend as MqdRenderingBackend;
-use miniquad::{window, EventHandler};
+
+use crate::state::QuadifyState;
 
 mod icon;
 
-/// Miniquad rendering backend object. Initialize ONLY after [`miniquad::start`]
-pub struct RenderingBackend(Box<dyn MqdRenderingBackend>);
-
-// For ease of use
-impl std::ops::Deref for RenderingBackend {
-	type Target = dyn MqdRenderingBackend;
-
-	fn deref(&self) -> &Self::Target {
-		&*self.0
-	}
-}
-
-impl RenderingBackend {
-	pub fn new() -> Self {
-		Self(window::new_rendering_backend())
-	}
-}
-
-/// General `miniquad` state handler for the entire app. It stores bevy's [`App`], manages its event loop and so on
-struct QuadState {
-	app: App,
-}
-
-impl EventHandler for QuadState {
-	fn update(&mut self) {}
-	fn draw(&mut self) {
-		// ! Updating the entire app here for now, but in the future there should be 2 different schedules for both `update` and `draw`
-		self.app.update();
-	}
-}
-
-/// Miniquad window and main loop runner plugin
+/// Initializes main window and starts the `miniquad` event loop
 pub struct WindowPlugin {
 	pub title: String,
 	pub width: i32,
@@ -79,12 +48,9 @@ impl Plugin for WindowPlugin {
 			conf.icon = icon.try_into().ok();
 		}
 
-		// Insert Resources here
-		app.insert_non_send_resource(RenderingBackend::new());
-
 		// Init Runner
 		app.set_runner(move |app| {
-			miniquad::start(conf, move || Box::new(QuadState { app: app }));
+			miniquad::start(conf, move || Box::new(QuadifyState::new(app)));
 		});
 	}
 }
