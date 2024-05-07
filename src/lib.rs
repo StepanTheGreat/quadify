@@ -3,9 +3,11 @@
 // ! there needs to be some sort of isolation for ALL of its functionality.
 
 pub mod prelude {
+	pub use crate::render::*;
 	pub use crate::window::*;
 	pub use crate::QuadifyPlugins;
 	pub use miniquad;
+	pub use vek;
 }
 
 #[cfg(test)]
@@ -25,7 +27,7 @@ impl PluginGroup for QuadifyPlugins {
 	fn build(self) -> PluginGroupBuilder {
 		PluginGroupBuilder::start::<Self>()
 			.add(state::StatePlugin)
-			.add(window::WindowPlugin::default())
 			.add(render::RenderBackendPlugin)
+			.add(window::WindowPlugin::default())
 	}
 }

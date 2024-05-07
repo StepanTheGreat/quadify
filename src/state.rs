@@ -2,6 +2,8 @@ use bevy_app::*;
 use bevy_ecs::schedule::ScheduleLabel;
 use miniquad::EventHandler;
 
+use crate::render::RenderingBackend;
+
 /// General `miniquad` state handler for the entire app. It stores bevy's [`App`], manages its event loop and so on
 pub(crate) struct QuadifyState {
 	app: App,
@@ -9,7 +11,8 @@ pub(crate) struct QuadifyState {
 
 impl QuadifyState {
 	/// Creates a new `QuadifyState` object
-	pub(crate) fn new(app: App) -> Self {
+	pub(crate) fn new(mut app: App) -> Self {
+		app.insert_non_send_resource(RenderingBackend::new());
 		Self { app }
 	}
 }

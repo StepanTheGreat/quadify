@@ -53,14 +53,14 @@ impl Plugin for WindowPlugin {
 
 		if let Some(platform) = &self.platform {
 			// SAFETY: There is no reason Platform doesn't implement Copy or Clone. It's static configuration data
-			let force_clone = unsafe { std::mem::transmute_copy(platform) };
-			conf.platform = force_clone;
+			conf.platform = unsafe { std::mem::transmute_copy(platform) };
 		}
 
 		// Init Runner
 		app.set_runner(move |app| {
-			dbg!(&conf);
-			miniquad::start(conf, move || Box::new(QuadifyState::new(app)));
+			miniquad::start(conf, move || {
+				Box::new(QuadifyState::new(app))
+			});
 		});
 	}
 }
