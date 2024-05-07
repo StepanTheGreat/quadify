@@ -13,6 +13,9 @@ readme = "README.md"
 bevy_ecs = "0.13.1"
 bevy_app = "0.13.1"
 miniquad = "0.4.0"
+image = { version = "0", default-features = false }
 
 [dev-dependencies]
-bevy = { version="0.13.0", default-features=false, features=["multi-threaded"] }
+bevy = { version = "0.13.0", default-features = false, features = [
+	"multi-threaded",
+] }
