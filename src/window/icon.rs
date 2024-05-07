@@ -25,14 +25,14 @@ impl WindowIcon {
 	}
 }
 
-fn downsample<const P: usize, const W: usize>(img: &DynamicImage) -> Option<[u8; P]> {
-	let height = P / W;
+fn downsample<const T: usize, const W: usize>(img: &DynamicImage) -> Option<[u8; T]> {
+	let height = T / W;
 	let thumbnail = img.thumbnail(W as _, height as _);
 
 	match thumbnail {
 		image::DynamicImage::ImageRgba8(rgba8) => {
 			let bytes = rgba8.into_raw();
-			let mut result: [u8; P] = [0; P];
+			let mut result: [u8; T] = [0; T];
 			result.copy_from_slice(&bytes);
 			Some(result)
 		}
@@ -40,10 +40,10 @@ fn downsample<const P: usize, const W: usize>(img: &DynamicImage) -> Option<[u8;
 	}
 }
 
-impl TryFrom<WindowIcon> for Icon {
+impl TryFrom<&WindowIcon> for Icon {
 	type Error = &'static str;
 
-	fn try_from(value: WindowIcon) -> Result<Self, Self::Error> {
+	fn try_from(value: &WindowIcon) -> Result<Self, Self::Error> {
 		static INVALID_IMAGE_FORMAT: &str = "Invalid image format, expected RGBA8 image";
 		let img = &value.0;
 

@@ -34,38 +34,39 @@ pub struct WindowPlugin {
 	pub height: i32,
 	pub fullscreen: bool,
 	pub high_dpi: bool,
-	// pub icon: Option<Icon>
-}
-
-impl WindowPlugin {
-	fn conf(&self) -> Conf {
-		Conf {
-			window_title: self.title.clone(),
-			window_width: self.width,
-			window_height: self.height,
-			fullscreen: self.fullscreen,
-			high_dpi: self.high_dpi,
-			..Default::default()
-		}
-	}
+	pub icon: Option<icon::WindowIcon>,
 }
 
 impl Default for WindowPlugin {
 	fn default() -> Self {
 		let conf = Conf::default();
+
 		Self {
 			title: conf.window_title,
 			width: conf.window_width,
 			height: conf.window_height,
 			fullscreen: conf.fullscreen,
 			high_dpi: conf.high_dpi,
+			icon: None,
 		}
 	}
 }
 
 impl Plugin for WindowPlugin {
 	fn build(&self, app: &mut App) {
-		let conf: Conf = self.conf();
+		let mut conf = Conf::default();
+
+		conf.window_title = self.title.clone();
+		conf.window_width = self.width;
+		conf.window_height = self.height;
+		conf.fullscreen = self.fullscreen;
+		conf.high_dpi = self.high_dpi;
+
+		if let Some(icon) = &self.icon {
+			// TODO: Log when Icon conversion fails
+			conf.icon = icon.try_into().ok();
+		}
+
 		app.set_runner(move |app| miniquad_runner(app, conf));
 	}
 }
