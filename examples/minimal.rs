@@ -1,6 +1,5 @@
-use bevy::prelude::*;
-use quadify::window::WindowPlugin;
-use quadify::QuadifyPlugins;
+use bevy_app::prelude::*;
+use quadify::prelude::*;
 
 fn main() {
 	App::empty()
