@@ -35,7 +35,11 @@ impl WindowIcon {
 			None => image::io::Reader::new(data).with_guessed_format().map_err(fs::Error::IOError)?,
 		};
 
-		let img = reader.decode().map_err(|_| fs::Error::IOSAssetNoData)?;
+		let img = reader.decode().map_err(|err| {
+			#[cfg(debug_assertions)]
+			eprintln!("Error decoding image: {:?}", err);
+			fs::Error::IOSAssetNoData
+		})?;
 		Ok(WindowIcon(img))
 	}
 }

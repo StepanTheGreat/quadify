@@ -11,7 +11,9 @@ pub(crate) struct QuadifyState {
 }
 
 /// Systems add to the [`MiniquadDraw`] schedule will be called from within the [`EventHandler::draw`] method
-/// On Android and Web, this schedule will be called conditionally. If the App is currently in focus
+///
+/// On Android and Web, this schedule will be called conditionally. If the App is currently in focus.
+/// Systems on this schedule are expected to be using [`RenderingBackend`] non-send resources, thus are run on the main thread. Without any form of multithreading.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, ScheduleLabel)]
 pub struct MiniquadDraw;
 

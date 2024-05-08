@@ -24,3 +24,4 @@ bevy = { version = "0.13.0", default-features = false, features = [
 	"multi-threaded",
 ] }
 pollster = "0.3.0"
+image = { version = "*", features = ["webp"], default-features = false }

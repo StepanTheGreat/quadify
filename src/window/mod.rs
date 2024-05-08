@@ -1,4 +1,5 @@
 use bevy_app::{App, Last, Plugin, PostUpdate};
+use bevy_ecs::schedule::ExecutorKind;
 use miniquad::conf::{Conf, Platform};
 
 pub mod events;
@@ -75,6 +76,9 @@ impl Plugin for WindowPlugin {
 			.add_event::<input::KeyboardEvent>()
 			.insert_resource(window_properties)
 			.init_schedule(state::MiniquadDraw)
+			.edit_schedule(state::MiniquadDraw, |s| {
+				s.set_executor_kind(ExecutorKind::MultiThreaded);
+			})
 			.add_systems(PostUpdate, (events::enforce_window_properties, events::update_window_properties))
 			.add_systems(Last, events::quit_on_app_exit);
 

@@ -21,6 +21,25 @@ fn spawn_window() {
 }
 
 #[test]
+fn spawn_window_ex() {
+	let icon = WindowIcon::from_file_async("examples/Peashooter2.webp", None);
+	let icon = pollster::block_on(icon).unwrap();
+
+	let window = WindowPlugin {
+		title: "Spawn Window with Icon".to_string(),
+		width: 600,
+		height: 600,
+		high_dpi: true,
+		resizeable: false,
+		icon: Some(icon),
+		..Default::default()
+	};
+
+	let mut app = App::new();
+	app.add_plugins(QuadifyPlugins.set(window)).run();
+}
+
+#[test]
 fn clear_color() {
 	let mut app = App::new();
 
