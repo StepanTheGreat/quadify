@@ -16,10 +16,12 @@ pub(crate) struct QuadifyState {
 pub struct MiniquadDraw;
 
 impl EventHandler for QuadifyState {
+	// Called every frame
 	fn update(&mut self) {
 		self.app.update();
 	}
 
+	// Called on every frame if App has an active surface
 	fn draw(&mut self) {
 		self.app.world.run_schedule(MiniquadDraw);
 	}
@@ -35,7 +37,7 @@ impl EventHandler for QuadifyState {
 		self.app.world.send_event(events::WindowEvent::Resized { width, height });
 	}
 	fn quit_requested_event(&mut self) {
-		self.app.world.send_event(events::WindowEvent::QuitRequested);
+		self.app.world.send_event(AppExit);
 	}
 
 	// File Drag and Drop
@@ -69,6 +71,15 @@ impl EventHandler for QuadifyState {
 	}
 
 	// Keyboard Events
+	fn char_event(&mut self, character: char, mods: miniquad::KeyMods, repeat: bool) {
+		self.app.world.send_event(input::KeyboardEvent::Char { character, mods, repeat });
+	}
+	fn key_down_event(&mut self, keycode: miniquad::KeyCode, mods: miniquad::KeyMods, repeat: bool) {
+		self.app.world.send_event(input::KeyboardEvent::KeyDown { keycode, mods, repeat });
+	}
+	fn key_up_event(&mut self, keycode: miniquad::KeyCode, mods: miniquad::KeyMods) {
+		self.app.world.send_event(input::KeyboardEvent::KeyUp { keycode, mods });
+	}
 }
 
 impl QuadifyState {

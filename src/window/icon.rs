@@ -3,6 +3,7 @@ use miniquad::{conf::Icon, fs};
 use std::io;
 
 /// Ergonomic interface to [`Icon`].
+#[repr(transparent)]
 pub struct WindowIcon(image::DynamicImage);
 
 impl WindowIcon {
@@ -13,6 +14,12 @@ impl WindowIcon {
 			Err(e) => callback(Err(e)),
 			Ok(data) => callback(WindowIcon::from_bytes(&data, format)),
 		});
+	}
+
+	/// Exactly the same as [`from_file`](WindowIcon::from_file) but async
+	pub async fn from_file_async<A: AsRef<str>>(path: A, format: Option<image::ImageFormat>) -> Result<WindowIcon, fs::Error> {
+		let data = crate::io::load_file(path.as_ref()).await?;
+		WindowIcon::from_bytes(&data, format)
 	}
 
 	/// Load an icon from a byte slice

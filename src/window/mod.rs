@@ -1,4 +1,4 @@
-use bevy_app::{App, MainSchedulePlugin, Plugin, PostUpdate};
+use bevy_app::{App, Plugin, PostUpdate};
 use miniquad::conf::{Conf, Platform};
 
 pub mod events;
@@ -6,7 +6,9 @@ pub mod icon;
 pub mod input;
 pub mod state;
 
-/// Initializes main window and starts the `miniquad` event loop
+/// Initializes main window and starts the `miniquad` event loop.
+///
+///  Emits [`AppExit`](bevy_app::AppExit) when the app is requested to close.
 pub struct WindowPlugin {
 	pub title: String,
 	pub width: i32,
@@ -71,8 +73,9 @@ impl Plugin for WindowPlugin {
 		app.add_event::<events::WindowEvent>()
 			.add_event::<events::DroppedFileEvent>()
 			.add_event::<input::MouseEvent>()
+			.add_event::<input::TouchEvent>()
+			.add_event::<input::KeyboardEvent>()
 			.insert_resource(window_properties)
-			.add_plugins(MainSchedulePlugin)
 			.init_schedule(state::MiniquadDraw)
 			.add_systems(PostUpdate, (events::enforce_window_properties, events::update_window_properties));
 

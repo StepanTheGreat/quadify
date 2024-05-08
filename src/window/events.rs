@@ -7,6 +7,8 @@ use bevy_ecs::{
 };
 use miniquad::CursorIcon;
 
+use super::input;
+
 #[derive(Debug, Clone, Copy, Event)]
 pub enum WindowEvent {
 	/// The window was minimized
@@ -20,8 +22,6 @@ pub enum WindowEvent {
 		/// New height of the window
 		height: f32,
 	},
-	/// The window was requested to close
-	QuitRequested,
 }
 
 #[derive(Debug, Clone, Copy, Resource)]
@@ -70,6 +70,18 @@ pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<Windo
 
 	*previous = Some(*properties);
 	*first_run = false;
+}
+
+/// Exits the application when the escape key is pressed
+pub fn exit_on_esc(mut keyboard_input: EventReader<input::KeyboardEvent>) {
+	for event in keyboard_input.read() {
+		if let input::KeyboardEvent::KeyDown {
+			keycode: miniquad::KeyCode::Escape, ..
+		} = event
+		{
+			miniquad::window::request_quit();
+		}
+	}
 }
 
 #[derive(Debug, Clone, Resource, Event)]

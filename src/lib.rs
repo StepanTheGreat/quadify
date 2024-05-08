@@ -3,9 +3,12 @@
 // ! there needs to be some sort of isolation for ALL of its functionality.
 
 pub mod prelude {
+	pub use crate::io::*;
 	pub use crate::render::{camera::*, render_target::*, *};
 	pub use crate::window::{events::*, icon::*, input::*, state::MiniquadDraw, *};
 	pub use crate::QuadifyPlugins;
+
+	pub use bevy_app;
 	pub use miniquad;
 	pub use vek;
 }
@@ -13,8 +16,9 @@ pub mod prelude {
 #[cfg(test)]
 mod tests;
 
-pub mod render;
-pub mod window;
+pub(crate) mod io;
+pub(crate) mod render;
+pub(crate) mod window;
 
 // Create Default plugin bundle
 use bevy_app::{PluginGroup, PluginGroupBuilder};

@@ -1,12 +1,13 @@
 use crate::prelude::*;
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
-use miniquad::CursorIcon;
+use miniquad::{CursorIcon, KeyCode as MqdKeyCode};
 use vek::rgba;
 
 #[test]
 fn spawn_window() {
-	let mut app = App::empty();
+	let mut app = App::new();
+
 	app.add_plugins(QuadifyPlugins.set(WindowPlugin {
 		title: "Spawn Window Test".to_string(),
 		width: 600,
@@ -15,12 +16,14 @@ fn spawn_window() {
 		resizeable: false,
 		..Default::default()
 	}));
+
 	app.run();
 }
 
 #[test]
 fn clear_color() {
-	let mut app = App::empty();
+	let mut app = App::new();
+
 	app.add_plugins(QuadifyPlugins.set(WindowPlugin {
 		title: "Clear Color Test".to_string(),
 		width: 600,
@@ -30,12 +33,14 @@ fn clear_color() {
 		..Default::default()
 	}));
 	app.add_systems(Startup, |mut clear_colour: ResMut<ClearColor>| clear_colour.0 = rgba::Rgba::new(1.0, 0.5, 0.5, 1.0));
+
 	app.run();
 }
 
 #[test]
 fn read_window_events() {
-	let mut app = App::empty();
+	let mut app = App::new();
+
 	app.add_plugins(QuadifyPlugins.set(WindowPlugin {
 		title: "Read Window Events Test".to_string(),
 		width: 600,
@@ -44,17 +49,20 @@ fn read_window_events() {
 		resizeable: true,
 		..Default::default()
 	}));
+
 	app.add_systems(Update, |mut events: EventReader<WindowEvent>| {
 		for event in events.read() {
 			println!("Window Event: {:?}", event);
 		}
 	});
+
 	app.run();
 }
 
 #[test]
 fn read_dropped_file_events() {
-	let mut app = App::empty();
+	let mut app = App::new();
+
 	app.add_plugins(QuadifyPlugins.set(WindowPlugin {
 		title: "Read Dropped File Events Test".to_string(),
 		width: 600,
@@ -63,17 +71,52 @@ fn read_dropped_file_events() {
 		resizeable: false,
 		..Default::default()
 	}));
+
 	app.add_systems(Update, |mut events: EventReader<DroppedFileEvent>| {
 		for event in events.read() {
 			println!("File Dropped into Application: {:?}", event);
 		}
 	});
+
+	app.run();
+}
+
+#[test]
+fn read_keyboard_events() {
+	let mut app = App::new();
+
+	app.add_plugins(QuadifyPlugins.set(WindowPlugin {
+		title: "Read Keyboard Events Test".to_string(),
+		width: 600,
+		height: 600,
+		high_dpi: false,
+		resizeable: true,
+		..Default::default()
+	}));
+
+	app.add_systems(
+		Update,
+		(
+			|mut events: EventReader<KeyboardEvent>, mut window_properties: ResMut<WindowProperties>| {
+				for event in events.read() {
+					match event {
+						KeyboardEvent::KeyDown { keycode: MqdKeyCode::F, .. } => window_properties.fullscreen = !window_properties.fullscreen,
+						KeyboardEvent::KeyDown { keycode: MqdKeyCode::R, .. } => window_properties.cursor_grabbed = !window_properties.cursor_grabbed,
+						KeyboardEvent::Char { character, .. } if character.is_numeric() => window_properties.width = (character.to_digit(10).unwrap() + 2) * 100,
+						ev => println!("Keyboard Event: {:?}", ev),
+					}
+				}
+			},
+			exit_on_esc,
+		),
+	);
+
 	app.run();
 }
 
 #[test]
 fn read_mouse_events() {
-	let mut app = App::empty();
+	let mut app = App::new();
 
 	app.add_plugins(QuadifyPlugins.set(WindowPlugin {
 		title: "Read Mouse Events Test".to_string(),
@@ -123,4 +166,10 @@ fn read_mouse_events() {
 	);
 
 	app.run();
+}
+
+#[test]
+fn test_async_file_loading() {
+	let data = pollster::block_on(load_string("Cargo.toml")).unwrap();
+	println!("{}", data);
 }

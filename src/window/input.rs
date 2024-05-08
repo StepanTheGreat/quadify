@@ -15,3 +15,10 @@ pub struct TouchEvent {
 	pub x: f32,
 	pub y: f32,
 }
+
+#[derive(Debug, Clone, Copy, Event)]
+pub enum KeyboardEvent {
+	Char { character: char, mods: miniquad::KeyMods, repeat: bool },
+	KeyDown { keycode: miniquad::KeyCode, mods: miniquad::KeyMods, repeat: bool },
+	KeyUp { keycode: miniquad::KeyCode, mods: miniquad::KeyMods },
+}
