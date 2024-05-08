@@ -74,7 +74,7 @@ impl Plugin for WindowPlugin {
 			.insert_resource(window_properties)
 			.add_plugins(MainSchedulePlugin)
 			.init_schedule(state::MiniquadDraw)
-			.add_systems(PostUpdate, events::enforce_window_properties);
+			.add_systems(PostUpdate, (events::enforce_window_properties, events::update_window_properties));
 
 		// Init Runner
 		app.set_runner(move |app| {

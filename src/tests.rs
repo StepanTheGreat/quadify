@@ -80,7 +80,7 @@ fn read_mouse_events() {
 		width: 600,
 		height: 600,
 		high_dpi: false,
-		resizeable: false,
+		resizeable: true,
 		..Default::default()
 	}));
 
@@ -99,12 +99,24 @@ fn read_mouse_events() {
 			];
 
 			for event in events.read() {
-				if let MouseEvent::MouseButtonDown(btn, x, y) = event {
-					if matches!(btn, miniquad::MouseButton::Middle) {
-						*idx = (*idx + 1) % CURSORS.len();
-						window_properties.cursor = CURSORS[*idx % CURSORS.len()];
+				match event {
+					MouseEvent::MouseButtonDown(btn, x, y) => match btn {
+						miniquad::MouseButton::Right => {
+							clear_colour.0 = rgba::Rgba::new(x / 600.0, y / 600.0, 0.5, 1.0);
+						}
+						miniquad::MouseButton::Left => {
+							window_properties.cursor_grabbed = !window_properties.cursor_grabbed;
+						}
+						miniquad::MouseButton::Middle => {
+							*idx = (*idx + 1) % CURSORS.len();
+							window_properties.cursor = CURSORS[*idx % CURSORS.len()];
+						}
+						_ => {}
+					},
+					MouseEvent::MouseWheel(..) => {
+						dbg!(&window_properties);
 					}
-					clear_colour.0 = rgba::Rgba::new(x / 600.0, y / 600.0, 0.5, 1.0);
+					_ => (),
 				}
 			}
 		},
