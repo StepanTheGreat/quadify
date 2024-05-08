@@ -1,9 +1,9 @@
 use std::path::PathBuf;
 
 use bevy_ecs::{
-	change_detection::DetectChanges,
-	event::Event,
-	system::{Local, Res, Resource},
+	change_detection::{DetectChanges, DetectChangesMut},
+	event::{Event, EventReader},
+	system::{Local, Res, ResMut, Resource},
 };
 use miniquad::CursorIcon;
 
@@ -31,6 +31,16 @@ pub struct WindowProperties {
 	pub height: u32,
 	pub cursor_grabbed: bool,
 	pub cursor: CursorIcon,
+}
+
+pub(crate) fn update_window_properties(mut properties: ResMut<WindowProperties>, mut window_events: EventReader<WindowEvent>) {
+	let properties = properties.bypass_change_detection();
+	for event in window_events.read() {
+		if let WindowEvent::Resized { width, height } = event {
+			properties.width = *width as u32;
+			properties.height = *height as u32;
+		}
+	}
 }
 
 pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<WindowProperties>)>, properties: Res<WindowProperties>) {
