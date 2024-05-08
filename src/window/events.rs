@@ -1,8 +1,9 @@
 use std::path::PathBuf;
 
+use bevy_app::AppExit;
 use bevy_ecs::{
 	change_detection::{DetectChanges, DetectChangesMut},
-	event::{Event, EventReader},
+	event::{Event, EventReader, EventWriter},
 	system::{Local, Res, ResMut, Resource},
 };
 use miniquad::CursorIcon;
@@ -22,6 +23,8 @@ pub enum WindowEvent {
 		/// New height of the window
 		height: f32,
 	},
+	/// The window has been requested to exit
+	CloseRequested,
 }
 
 #[derive(Debug, Clone, Copy, Resource)]
@@ -73,14 +76,21 @@ pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<Windo
 }
 
 /// Exits the application when the escape key is pressed
-pub fn exit_on_esc(mut keyboard_input: EventReader<input::KeyboardEvent>) {
+pub fn quit_on_esc(mut keyboard_input: EventReader<input::KeyboardEvent>, mut app_exit: EventWriter<AppExit>) {
 	for event in keyboard_input.read() {
 		if let input::KeyboardEvent::KeyDown {
 			keycode: miniquad::KeyCode::Escape, ..
 		} = event
 		{
-			miniquad::window::request_quit();
+			app_exit.send(AppExit);
 		}
+	}
+}
+
+/// Closes the application on an [`AppExit`] event
+pub fn quit_on_app_exit(app_exit: EventReader<AppExit>) {
+	if !app_exit.is_empty() {
+		miniquad::window::request_quit();
 	}
 }
 

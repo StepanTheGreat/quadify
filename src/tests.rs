@@ -107,7 +107,7 @@ fn read_keyboard_events() {
 					}
 				}
 			},
-			exit_on_esc,
+			quit_on_esc,
 		),
 	);
 
