@@ -1,6 +1,7 @@
 use crate::prelude::*;
-use bevy_app::{App, PluginGroup, Startup};
-use bevy_ecs::system::ResMut;
+use bevy_app::prelude::*;
+use bevy_ecs::prelude::*;
+use miniquad::CursorIcon;
 use vek::rgba;
 
 #[test]
@@ -11,7 +12,7 @@ fn spawn_window() {
 		width: 600,
 		height: 600,
 		high_dpi: true,
-		window_resizable: false,
+		resizeable: false,
 		..Default::default()
 	}));
 	app.run();
@@ -25,11 +26,89 @@ fn clear_color() {
 		width: 600,
 		height: 600,
 		high_dpi: true,
-		window_resizable: false,
+		resizeable: false,
 		..Default::default()
 	}));
-	app.add_systems(Startup, |mut clear_colour: ResMut<ClearColor>| {
-		clear_colour.0 = rgba::Rgba::new(0.5, 0.5, 0.5, 1.0);
+	app.add_systems(Startup, |mut clear_colour: ResMut<ClearColor>| clear_colour.0 = rgba::Rgba::new(1.0, 0.5, 0.5, 1.0));
+	app.run();
+}
+
+#[test]
+fn read_window_events() {
+	let mut app = App::empty();
+	app.add_plugins(QuadifyPlugins.set(WindowPlugin {
+		title: "Read Window Events Test".to_string(),
+		width: 600,
+		height: 600,
+		high_dpi: false,
+		resizeable: true,
+		..Default::default()
+	}));
+	app.add_systems(Update, |mut events: EventReader<WindowEvent>| {
+		for event in events.read() {
+			println!("Window Event: {:?}", event);
+		}
 	});
+	app.run();
+}
+
+#[test]
+fn read_dropped_file_events() {
+	let mut app = App::empty();
+	app.add_plugins(QuadifyPlugins.set(WindowPlugin {
+		title: "Read Dropped File Events Test".to_string(),
+		width: 600,
+		height: 600,
+		high_dpi: false,
+		resizeable: false,
+		..Default::default()
+	}));
+	app.add_systems(Update, |mut events: EventReader<DroppedFileEvent>| {
+		for event in events.read() {
+			println!("File Dropped into Application: {:?}", event);
+		}
+	});
+	app.run();
+}
+
+#[test]
+fn read_mouse_events() {
+	let mut app = App::empty();
+
+	app.add_plugins(QuadifyPlugins.set(WindowPlugin {
+		title: "Read Mouse Events Test".to_string(),
+		width: 600,
+		height: 600,
+		high_dpi: false,
+		resizeable: false,
+		..Default::default()
+	}));
+
+	app.add_systems(
+		Update,
+		|mut events: EventReader<MouseEvent>, mut idx: Local<usize>, mut clear_colour: ResMut<ClearColor>, mut window_properties: ResMut<WindowProperties>| {
+			static CURSORS: [CursorIcon; 8] = [
+				CursorIcon::Default,
+				CursorIcon::Crosshair,
+				CursorIcon::Text,
+				CursorIcon::Move,
+				CursorIcon::NotAllowed,
+				CursorIcon::Pointer,
+				CursorIcon::Wait,
+				CursorIcon::Help,
+			];
+
+			for event in events.read() {
+				if let MouseEvent::MouseButtonDown(btn, x, y) = event {
+					if matches!(btn, miniquad::MouseButton::Middle) {
+						*idx = (*idx + 1) % CURSORS.len();
+						window_properties.cursor = CURSORS[*idx % CURSORS.len()];
+					}
+					clear_colour.0 = rgba::Rgba::new(x / 600.0, y / 600.0, 0.5, 1.0);
+				}
+			}
+		},
+	);
+
 	app.run();
 }

@@ -5,10 +5,10 @@ use bevy_ecs::{
 use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 use vek::rgba;
 
-use crate::state;
+use crate::window::state;
 
-mod camera;
-mod render_target;
+pub mod camera;
+pub mod render_target;
 
 /// Miniquad rendering backend object. Initialize ONLY after [`miniquad::start`]
 pub struct RenderingBackend(pub(crate) Box<dyn MqdRenderingBackend>);

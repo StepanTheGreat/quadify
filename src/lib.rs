@@ -3,8 +3,8 @@
 // ! there needs to be some sort of isolation for ALL of its functionality.
 
 pub mod prelude {
-	pub use crate::render::*;
-	pub use crate::window::*;
+	pub use crate::render::{camera::*, render_target::*, *};
+	pub use crate::window::{events::*, icon::*, input::*, state::MiniquadDraw, *};
 	pub use crate::QuadifyPlugins;
 	pub use miniquad;
 	pub use vek;
@@ -14,7 +14,6 @@ pub mod prelude {
 mod tests;
 
 pub mod render;
-pub mod state;
 pub mod window;
 
 // Create Default plugin bundle
@@ -25,9 +24,6 @@ pub struct QuadifyPlugins;
 
 impl PluginGroup for QuadifyPlugins {
 	fn build(self) -> PluginGroupBuilder {
-		PluginGroupBuilder::start::<Self>()
-			.add(state::StatePlugin)
-			.add(render::RenderBackendPlugin)
-			.add(window::WindowPlugin::default())
+		PluginGroupBuilder::start::<Self>().add(render::RenderBackendPlugin).add(window::WindowPlugin::default())
 	}
 }

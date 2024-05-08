@@ -1,0 +1,69 @@
+use std::path::PathBuf;
+
+use bevy_ecs::{
+	change_detection::DetectChanges,
+	event::Event,
+	system::{Local, Res, Resource},
+};
+use miniquad::CursorIcon;
+
+#[derive(Debug, Clone, Copy, Event)]
+pub enum WindowEvent {
+	/// The window was minimized
+	Minimized,
+	/// The window was restored
+	Restored,
+	/// The window was resized
+	Resized {
+		/// New width of the window
+		width: f32,
+		/// New height of the window
+		height: f32,
+	},
+	/// The window was requested to close
+	QuitRequested,
+}
+
+#[derive(Debug, Clone, Copy, Resource)]
+pub struct WindowProperties {
+	pub fullscreen: bool,
+	pub width: u32,
+	pub height: u32,
+	pub cursor_grabbed: bool,
+	pub cursor: CursorIcon,
+}
+
+pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<WindowProperties>)>, properties: Res<WindowProperties>) {
+	let (first_run, previous) = &mut *first_run;
+
+	if properties.is_changed() || *first_run {
+		if let Some(previous) = previous {
+			if previous.fullscreen != properties.fullscreen {
+				miniquad::window::set_fullscreen(properties.fullscreen);
+			}
+			if previous.width != properties.width || previous.height != properties.height {
+				miniquad::window::set_window_size(properties.width, properties.height);
+			}
+			if previous.cursor_grabbed != properties.cursor_grabbed {
+				miniquad::window::set_cursor_grab(properties.cursor_grabbed);
+			}
+			if previous.cursor != properties.cursor {
+				miniquad::window::set_mouse_cursor(properties.cursor);
+			}
+		} else {
+			miniquad::window::set_fullscreen(properties.fullscreen);
+			miniquad::window::set_window_size(properties.width, properties.height);
+			miniquad::window::set_cursor_grab(properties.cursor_grabbed);
+			miniquad::window::set_mouse_cursor(properties.cursor);
+		}
+	}
+
+	*previous = Some(*properties);
+	*first_run = false;
+}
+
+#[derive(Debug, Clone, Resource, Event)]
+pub struct DroppedFileEvent {
+	pub path: Option<PathBuf>,
+	pub bytes: Option<Vec<u8>>,
+}

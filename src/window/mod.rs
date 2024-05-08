@@ -1,9 +1,10 @@
-use bevy_app::{App, Plugin};
+use bevy_app::{App, MainSchedulePlugin, Plugin, PostUpdate};
 use miniquad::conf::{Conf, Platform};
 
-use crate::state::QuadifyState;
-
-mod icon;
+pub mod events;
+pub mod icon;
+pub mod input;
+pub mod state;
 
 /// Initializes main window and starts the `miniquad` event loop
 pub struct WindowPlugin {
@@ -12,8 +13,9 @@ pub struct WindowPlugin {
 	pub height: i32,
 	pub fullscreen: bool,
 	pub high_dpi: bool,
-	pub window_resizable: bool,
+	pub resizeable: bool,
 	pub icon: Option<icon::WindowIcon>,
+	pub default_cursor: Option<miniquad::CursorIcon>,
 	/// Platform specific settings. See [`miniquad::conf::Platform`]
 	pub platform: Option<Platform>,
 }
@@ -28,7 +30,8 @@ impl Default for WindowPlugin {
 			height: conf.window_height,
 			fullscreen: conf.fullscreen,
 			high_dpi: conf.high_dpi,
-			window_resizable: conf.window_resizable,
+			resizeable: conf.window_resizable,
+			default_cursor: None,
 			icon: None,
 			platform: None,
 		}
@@ -44,7 +47,7 @@ impl Plugin for WindowPlugin {
 		conf.window_height = self.height;
 		conf.fullscreen = self.fullscreen;
 		conf.high_dpi = self.high_dpi;
-		conf.window_resizable = self.window_resizable;
+		conf.window_resizable = self.resizeable;
 
 		if let Some(icon) = &self.icon {
 			// TODO: Log when Icon conversion fails
@@ -56,11 +59,26 @@ impl Plugin for WindowPlugin {
 			conf.platform = unsafe { std::mem::transmute_copy(platform) };
 		}
 
+		let window_properties = events::WindowProperties {
+			fullscreen: self.fullscreen,
+			width: self.width as u32,
+			height: self.height as u32,
+			cursor_grabbed: false,
+			cursor: miniquad::CursorIcon::Default,
+		};
+
+		// Init Resources, Events, and Systems
+		app.add_event::<events::WindowEvent>()
+			.add_event::<events::DroppedFileEvent>()
+			.add_event::<input::MouseEvent>()
+			.insert_resource(window_properties)
+			.add_plugins(MainSchedulePlugin)
+			.init_schedule(state::MiniquadDraw)
+			.add_systems(PostUpdate, events::enforce_window_properties);
+
 		// Init Runner
 		app.set_runner(move |app| {
-			miniquad::start(conf, move || {
-				Box::new(QuadifyState::new(app))
-			});
+			miniquad::start(conf, move || Box::new(state::QuadifyState::new(app)));
 		});
 	}
 }
