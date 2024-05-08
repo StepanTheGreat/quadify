@@ -36,8 +36,7 @@ impl WindowIcon {
 		};
 
 		let img = reader.decode().map_err(|err| {
-			#[cfg(debug_assertions)]
-			eprintln!("Error decoding image: {:?}", err);
+			log::error!("Failed to decode image: {:?}", err);
 			fs::Error::IOSAssetNoData
 		})?;
 		Ok(WindowIcon(img))
