@@ -1,69 +1,89 @@
-use bevy::window::*;
-use bevy::{
-    app::{AppExit, PluginsState},
-    prelude::*,
-};
-use macroquad::prelude::{next_frame, Conf};
+use bevy_app::{App, Last, Plugin};
+use bevy_ecs::schedule::ExecutorKind;
+use miniquad::conf::{Conf, Platform};
 
-mod converter;
-mod events;
+pub mod events;
+pub mod icon;
+pub mod input;
+pub mod state;
 
-/// Macroquad window integration plugin (doesn't support multiple windows).
-pub struct MQWindowPlugin {
-    /// Macroquad's high-dpi option, for now with no use
-    _high_dpi: bool,
-}
-impl Default for MQWindowPlugin {
-    fn default() -> Self {
-        Self { _high_dpi: false }
-    }
-}
-
-impl Plugin for MQWindowPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(PreStartup, events::init_events)
-            .add_systems(PreUpdate, events::get_events)
-            .set_runner(macro_runner);
-    }
+/// Initializes main window and starts the `miniquad` event loop.
+pub struct WindowPlugin {
+	pub title: String,
+	pub width: i32,
+	pub height: i32,
+	pub fullscreen: bool,
+	pub high_dpi: bool,
+	pub resizeable: bool,
+	pub icon: Option<icon::WindowIcon>,
+	pub default_cursor: Option<miniquad::CursorIcon>,
+	/// Platform specific settings. See [`miniquad::conf::Platform`]
+	pub platform: Option<Platform>,
 }
 
-fn macro_runner(mut app: App) {
-    if app.plugins_state() != PluginsState::Ready {
-        app.finish();
-        app.cleanup();
-    }
+impl Default for WindowPlugin {
+	fn default() -> Self {
+		let conf = Conf::default();
 
-    let mut wconf = Conf::default();
-    for window in app
-        .world
-        .query_filtered::<&Window, With<PrimaryWindow>>()
-        .iter(&app.world)
-    {
-        wconf = Conf {
-            window_title: window.title.clone(),
-            window_resizable: window.resizable,
-            window_width: window.width() as i32,
-            window_height: window.height() as i32,
-            high_dpi: true, // ! There's no way to change this
-            fullscreen: match window.mode {
-                WindowMode::Windowed => false,
-                WindowMode::Fullscreen
-                | WindowMode::BorderlessFullscreen
-                | WindowMode::SizedFullscreen => true,
-            },
-            ..Default::default()
-        };
-    }
+		Self {
+			title: conf.window_title,
+			width: conf.window_width,
+			height: conf.window_height,
+			fullscreen: conf.fullscreen,
+			high_dpi: conf.high_dpi,
+			resizeable: conf.window_resizable,
+			default_cursor: None,
+			icon: None,
+			platform: None,
+		}
+	}
+}
 
-    macroquad::Window::from_config(wconf, async move {
-        loop {
-            if let Some(events) = app.world.get_resource::<Events<AppExit>>() {
-                if !events.is_empty() {
-                    break;
-                }
-            }
-            app.update();
-            next_frame().await;
-        }
-    });
+impl Plugin for WindowPlugin {
+	fn build(&self, app: &mut App) {
+		let mut conf = Conf::default();
+
+		conf.window_title = self.title.clone();
+		conf.window_width = self.width;
+		conf.window_height = self.height;
+		conf.fullscreen = self.fullscreen;
+		conf.high_dpi = self.high_dpi;
+		conf.window_resizable = self.resizeable;
+
+		if let Some(icon) = &self.icon {
+			// TODO: Log when Icon conversion fails
+			conf.icon = icon.try_into().ok();
+		}
+
+		if let Some(platform) = &self.platform {
+			// SAFETY: There is no reason Platform doesn't implement Copy or Clone. It's static configuration data
+			conf.platform = unsafe { std::mem::transmute_copy(platform) };
+		}
+
+		let window_properties = events::WindowProperties {
+			fullscreen: self.fullscreen,
+			width: self.width as u32,
+			height: self.height as u32,
+			cursor_grabbed: false,
+			cursor: miniquad::CursorIcon::Default,
+		};
+
+		// Init Resources, Events, and Systems
+		app.add_event::<events::WindowEvent>()
+			.add_event::<events::DroppedFileEvent>()
+			.add_event::<input::MouseEvent>()
+			.add_event::<input::TouchEvent>()
+			.add_event::<input::KeyboardEvent>()
+			.insert_resource(window_properties)
+			.init_schedule(state::MiniquadDraw)
+			.edit_schedule(state::MiniquadDraw, |s| {
+				s.set_executor_kind(ExecutorKind::MultiThreaded);
+			})
+			.add_systems(Last, (events::enforce_window_properties, events::update_window_properties, events::quit_on_app_exit));
+
+		// Init Runner
+		app.set_runner(move |app| {
+			miniquad::start(conf, move || Box::new(state::QuadifyState::new(app)));
+		});
+	}
 }

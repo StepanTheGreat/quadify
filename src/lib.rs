@@ -2,35 +2,32 @@
 // ! uses bevy's parallel processing plugin. Macroquad is designed to work on a single thread, thus
 // ! there needs to be some sort of isolation for ALL of its functionality.
 
-use bevy::{
-    a11y::AccessibilityPlugin, app::PluginGroupBuilder, diagnostic::DiagnosticsPlugin,
-    input::InputPlugin, log::LogPlugin, prelude::*, time::TimePlugin,
-};
-pub use macroquad;
-use window::MQWindowPlugin; // Only import it if you actually need it
-                            // use sprite::RenderingPlugin;
+pub mod prelude {
+	pub use crate::io::*;
+	pub use crate::render::{camera::*, render_target::*, *};
+	pub use crate::window::{events::*, icon::*, input::*, state::MiniquadDraw, *};
+	pub use crate::QuadifyPlugins;
 
-// pub mod sprite;
-pub mod prelude;
-pub mod window;
+	pub use bevy_app;
+	pub use miniquad;
+	pub use vek;
+}
 
-/// This collection of plugins is a custom made DefaultPlugins bundle
+#[cfg(test)]
+mod tests;
+
+pub(crate) mod io;
+pub(crate) mod render;
+pub(crate) mod window;
+
+// Create Default plugin bundle
+use bevy_app::{PluginGroup, PluginGroupBuilder};
+
+/// [`QuadifyPlugins`] is a custom made [`DefaultPlugins`](https://docs.rs/bevy/latest/bevy/struct.DefaultPlugins.html) bundle, built on top of miniquad
 pub struct QuadifyPlugins;
+
 impl PluginGroup for QuadifyPlugins {
-    fn build(self) -> PluginGroupBuilder {
-        PluginGroupBuilder::start::<Self>()
-            .add(LogPlugin::default())
-            .add(TaskPoolPlugin::default())
-            .add(TypeRegistrationPlugin)
-            .add(FrameCountPlugin)
-            .add(TimePlugin)
-            .add(TransformPlugin)
-            .add(HierarchyPlugin)
-            .add(DiagnosticsPlugin)
-            .add(InputPlugin)
-            .add(WindowPlugin::default())
-            .add(AccessibilityPlugin)
-            // ? Custom Quadify Plugins. Planning to limit them by features
-            .add(MQWindowPlugin::default())
-    }
+	fn build(self) -> PluginGroupBuilder {
+		PluginGroupBuilder::start::<Self>().add(render::RenderBackendPlugin).add(window::WindowPlugin::default())
+	}
 }

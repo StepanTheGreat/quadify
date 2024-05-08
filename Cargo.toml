@@ -4,13 +4,22 @@ repository = "https://github.com/StepanTheGreat/quadify"
 version = "0.1.0"
 edition = "2021"
 license = "MIT OR Apache-2.0"
-description = "Bevy plugin that integrates macroquad's windowing/rendering/sound API"
-keywords = ["bevy", "macroquad", "miniquad"]
+description = "Bevy plugin that integrates miniquad's windowing/rendering/sound API"
+keywords = ["bevy", "miniquad"]
 categories = ["game-engines"]
 readme = "README.md"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
-bevy = {version="0.12.0", default-features=false}
-macroquad = "0.4.5"
+bevy_ecs = "0.13.1"
+bevy_app = "0.13.1"
+miniquad = "0.4.0"
+image = { version = "0", default-features = false }
+vek = { version = "0.16.1", default-features = false, features = [
+	"rgba",
+	"uv",
+] }
+log = "0.4.21"
+
+[dev-dependencies]
+pollster = "0.3.0"
+image = { version = "*", features = ["webp"], default-features = false }
