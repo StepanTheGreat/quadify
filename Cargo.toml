@@ -22,4 +22,4 @@ log = "0.4.21"
 
 [dev-dependencies]
 pollster = "0.3.0"
-image = { version = "*", features = ["webp"], default-features = false }
+image = { version = "*", features = ["png"], default-features = false }
