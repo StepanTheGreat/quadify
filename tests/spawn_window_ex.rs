@@ -16,6 +16,7 @@ fn main() {
 		..Default::default()
 	};
 
-	let mut app = App::new();
-	app.add_plugins(QuadifyPlugins.set(window)).run();
+	App::new()
+	    .add_plugins(QuadifyPlugins.set(window))
+        .run();
 }
