@@ -57,10 +57,6 @@ impl Default for ClearColor {
 }
 
 fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: Res<ClearColor>, main_render_target: Res<render_target::MainRenderTarget>) {
-	if !clear_color.is_changed() {
-		return;
-	}
-
 	let color = clear_color.as_ref().0;
 	let clear = PassAction::clear_color(color.r, color.g, color.b, color.a);
 
@@ -73,5 +69,6 @@ fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: 
 	}
 
 	// End the render pass
+	// TODO: Fill the render pass with some basic materials
 	render_ctx.end_render_pass();
 }

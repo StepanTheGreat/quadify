@@ -1,9 +1,10 @@
+use quadify::prelude::*;
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
-use miniquad::CursorIcon;
-use quadify::prelude::*;
 use vek::rgba;
+use miniquad::CursorIcon;
 
+#[test]
 fn main() {
 	App::new()
 		.add_plugins(QuadifyPlugins.set(WindowPlugin {
@@ -14,11 +15,11 @@ fn main() {
 			resizeable: true,
 			..Default::default()
 		}))
-		.add_systems(Update, mouse_events)
+		.add_systems(Update, read_mouse_events)
 		.run();
 }
 
-fn mouse_events(
+fn read_mouse_events(
 	mut events: EventReader<MouseEvent>, 
 	mut idx: Local<usize>, 
 	mut clear_colour: ResMut<ClearColor>, 
