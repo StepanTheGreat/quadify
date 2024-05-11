@@ -13,9 +13,6 @@ pub mod prelude {
 	pub use vek;
 }
 
-#[cfg(test)]
-mod tests;
-
 pub(crate) mod io;
 pub(crate) mod render;
 pub(crate) mod window;
