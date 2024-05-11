@@ -1,6 +1,3 @@
-use bevy_app::prelude::*;
-use bevy_ecs::prelude::*;
-use miniquad::CursorIcon;
 use quadify::prelude::*;
 use vek::rgba;
 

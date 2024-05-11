@@ -1,7 +1,4 @@
-use bevy_ecs::{
-	change_detection::DetectChanges,
-	system::{NonSendMut, Res, Resource},
-};
+use bevy_ecs::system::{NonSendMut, Res, Resource};
 use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 use vek::rgba;
 

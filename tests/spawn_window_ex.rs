@@ -1,4 +1,3 @@
-use bevy_app::prelude::*;
 use quadify::prelude::*;
 
 #[test]
