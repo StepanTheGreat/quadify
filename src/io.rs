@@ -12,7 +12,10 @@ impl std::future::Future for FileLoadingFuture {
 		match self.0.try_recv() {
 			Ok(res) => task::Poll::Ready(res),
 			Err(oneshot::TryRecvError::Empty) => task::Poll::Pending,
-			Err(oneshot::TryRecvError::Disconnected) => task::Poll::Ready(Err(fs::Error::IOError(io::Error::new(io::ErrorKind::Other, "File loading future was dropped")))),
+			Err(oneshot::TryRecvError::Disconnected) => {
+				let error = io::Error::new(io::ErrorKind::Other, "File loading future was dropped");
+				task::Poll::Ready(Err(fs::Error::IOError(error)))
+			}
 		}
 	}
 }
