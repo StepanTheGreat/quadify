@@ -4,6 +4,7 @@ use quadify::prelude::*;
 #[test]
 fn main() {
 	println!("TIP: press ESC to quit the test!");
+
 	App::new()
 		.add_plugins(QuadifyPlugins.set(WindowPlugin {
 			title: "Read Keyboard Events Test".to_string(),

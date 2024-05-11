@@ -1,6 +1,6 @@
 use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::ExecutorKind;
-use miniquad::conf::{Conf, Platform};
+use miniquad::conf::{Conf, PlatformSettings};
 
 pub mod events;
 pub mod icon;
@@ -18,7 +18,7 @@ pub struct WindowPlugin {
 	pub icon: Option<icon::WindowIcon>,
 	pub default_cursor: Option<miniquad::CursorIcon>,
 	/// Platform specific settings. See [`miniquad::conf::Platform`]
-	pub platform: Option<Platform>,
+	pub platform: Option<PlatformSettings>,
 }
 
 impl Default for WindowPlugin {
@@ -51,13 +51,11 @@ impl Plugin for WindowPlugin {
 		conf.window_resizable = self.resizeable;
 
 		if let Some(icon) = &self.icon {
-			// TODO: Log when Icon conversion fails
 			conf.icon = icon.try_into().ok();
 		}
 
 		if let Some(platform) = &self.platform {
-			// SAFETY: There is no reason Platform doesn't implement Copy or Clone. It's static configuration data
-			conf.platform = unsafe { std::mem::transmute_copy(platform) };
+			conf.platform = platform.clone();
 		}
 
 		let window_properties = events::WindowProperties {

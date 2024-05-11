@@ -24,6 +24,7 @@ pub async fn load_file(path: &str) -> Result<Vec<u8>, fs::Error> {
 		});
 		sender.send(res).unwrap();
 	});
+
 	FileLoadingFuture(receiver).await
 }
 

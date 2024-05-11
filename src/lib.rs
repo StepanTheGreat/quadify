@@ -1,6 +1,4 @@
-// ! The current problem is that all bevy systems can be run in parallel, if one
-// ! uses bevy's parallel processing plugin. Macroquad is designed to work on a single thread, thus
-// ! there needs to be some sort of isolation for ALL of its functionality.
+#![forbid(unsafe_code)]
 
 pub mod prelude {
 	pub use crate::io::*;

@@ -21,7 +21,6 @@ vek = { version = "0.16.1", default-features = false, features = [
 [dependencies.miniquad]
 package = "miniquad_wasm_bindgen"
 git = "https://github.com/sokorototo/miniquad-wasm-bindgen"
-branch = "master"
 features = ["log-impl"]
 
 [dev-dependencies]
