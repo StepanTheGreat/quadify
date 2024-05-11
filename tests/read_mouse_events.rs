@@ -1,3 +1,4 @@
+use miniquad::CursorIcon;
 use quadify::prelude::*;
 use vek::rgba;
 
@@ -43,7 +44,7 @@ fn read_mouse_events(mut events: EventReader<MouseEvent>, mut idx: Local<usize>,
 				}
 				_ => {}
 			},
-			MouseEvent::MouseWheel(..) => {
+			MouseEvent::MouseScroll(..) => {
 				dbg!(&window_properties);
 			}
 			_ => (),

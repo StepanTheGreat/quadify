@@ -64,7 +64,7 @@ impl EventHandler for QuadifyState {
 		self.app.world.send_event(input::MouseEvent::MouseButtonUp(button, x, y));
 	}
 	fn mouse_wheel_event(&mut self, x: f32, y: f32) {
-		self.app.world.send_event(input::MouseEvent::MouseWheel(x, y));
+		self.app.world.send_event(input::MouseEvent::MouseScroll(x, y));
 	}
 
 	// Touch Events

@@ -42,7 +42,7 @@ fn mouse_events(mut events: EventReader<MouseEvent>, mut idx: Local<usize>, mut 
 				}
 				_ => {}
 			},
-			MouseEvent::MouseWheel(..) => {
+			MouseEvent::MouseScroll(..) => {
 				dbg!(&window_properties);
 			}
 			_ => (),

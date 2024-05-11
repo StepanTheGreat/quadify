@@ -1,3 +1,4 @@
+use miniquad::KeyCode;
 use quadify::prelude::*;
 
 #[test]
@@ -19,8 +20,8 @@ fn main() {
 fn keyboard_events(mut events: EventReader<KeyboardEvent>, mut window_properties: ResMut<WindowProperties>) {
 	for event in events.read() {
 		match event {
-			KeyboardEvent::KeyDown { keycode: MqdKeyCode::F, .. } => window_properties.fullscreen = !window_properties.fullscreen,
-			KeyboardEvent::KeyDown { keycode: MqdKeyCode::R, .. } => window_properties.cursor_grabbed = !window_properties.cursor_grabbed,
+			KeyboardEvent::KeyDown { keycode: KeyCode::F, .. } => window_properties.fullscreen = !window_properties.fullscreen,
+			KeyboardEvent::KeyDown { keycode: KeyCode::R, .. } => window_properties.cursor_grabbed = !window_properties.cursor_grabbed,
 			KeyboardEvent::Char { character, .. } if character.is_numeric() => window_properties.width = (character.to_digit(10).unwrap() + 2) * 100,
 			ev => println!("Keyboard Event: {:?}", ev),
 		}
