@@ -2,9 +2,9 @@ use bevy_ecs::event::Event;
 
 #[derive(Debug, Clone, Copy, Event)]
 pub enum MouseEvent {
+	MouseButtonUp(miniquad::MouseButton, f32, f32),
 	MouseButtonDown(miniquad::MouseButton, f32, f32),
 	MouseMotion(f32, f32),
-	MouseButtonUp(miniquad::MouseButton, f32, f32),
 	MouseWheel(f32, f32),
 }
 
@@ -16,6 +16,10 @@ pub struct TouchEvent {
 	pub y: f32,
 }
 
+/// Keyboard event.
+///
+/// [`character docs`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/char)
+/// [`repeat docs`](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat)
 #[derive(Debug, Clone, Copy, Event)]
 pub enum KeyboardEvent {
 	Char { character: char, mods: miniquad::KeyMods, repeat: bool },
