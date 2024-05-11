@@ -1,6 +1,6 @@
-use quadify::prelude::*;
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
+use quadify::prelude::*;
 
 #[test]
 fn main() {

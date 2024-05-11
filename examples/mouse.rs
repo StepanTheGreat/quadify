@@ -18,12 +18,7 @@ fn main() {
 		.run();
 }
 
-fn mouse_events(
-	mut events: EventReader<MouseEvent>, 
-	mut idx: Local<usize>, 
-	mut clear_colour: ResMut<ClearColor>, 
-	mut window_properties: ResMut<WindowProperties>
-) {
+fn mouse_events(mut events: EventReader<MouseEvent>, mut idx: Local<usize>, mut clear_colour: ResMut<ClearColor>, mut window_properties: ResMut<WindowProperties>) {
 	static CURSORS: [CursorIcon; 8] = [
 		CursorIcon::Default,
 		CursorIcon::Crosshair,

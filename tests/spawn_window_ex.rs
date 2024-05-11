@@ -1,5 +1,5 @@
-use quadify::prelude::*;
 use bevy_app::prelude::*;
+use quadify::prelude::*;
 
 #[test]
 fn main() {
@@ -16,7 +16,5 @@ fn main() {
 		..Default::default()
 	};
 
-	App::new()
-	    .add_plugins(QuadifyPlugins.set(window))
-        .run();
+	App::new().add_plugins(QuadifyPlugins.set(window)).run();
 }
