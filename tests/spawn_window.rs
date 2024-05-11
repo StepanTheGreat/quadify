@@ -3,7 +3,7 @@ use quadify::prelude::*;
 #[test]
 fn main() {
 	WindowIcon::from_file(
-		"examples/peashooter2.png",
+		"tests/peashooter2.png",
 		|icon| {
 			let icon = icon.unwrap();
 
