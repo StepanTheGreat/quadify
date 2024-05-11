@@ -79,7 +79,7 @@ impl Plugin for WindowPlugin {
 			.edit_schedule(state::MiniquadDraw, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.add_systems(Last, (events::enforce_window_properties, events::update_window_properties, events::quit_on_app_exit));
+			.add_systems(Last, (events::enforce_window_properties, events::sync_window_properties, events::quit_on_app_exit));
 
 		// Init Runner
 		app.set_runner(move |app| {

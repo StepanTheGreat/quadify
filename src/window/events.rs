@@ -36,7 +36,7 @@ pub struct WindowProperties {
 	pub cursor: CursorIcon,
 }
 
-pub(crate) fn update_window_properties(mut properties: ResMut<WindowProperties>, mut window_events: EventReader<WindowEvent>) {
+pub(crate) fn sync_window_properties(mut properties: ResMut<WindowProperties>, mut window_events: EventReader<WindowEvent>) {
 	let properties = properties.bypass_change_detection();
 	for event in window_events.read() {
 		if let WindowEvent::Resized { width, height } = event {
