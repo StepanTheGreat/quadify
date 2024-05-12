@@ -1,3 +1,4 @@
+use miniquad::CursorIcon;
 use quadify::prelude::*;
 use vek::rgba;
 
@@ -11,7 +12,7 @@ fn main() {
 			resizeable: false,
 			..Default::default()
 		}))
-		.add_systems(Update, mouse_events)
+		.add_systems(Update, (mouse_events, quit_on_esc))
 		.run();
 }
 
@@ -43,7 +44,7 @@ fn mouse_events(mut events: EventReader<MouseEvent>, mut idx: Local<usize>, mut 
 				_ => {}
 			},
 			MouseEvent::MouseScroll(..) => {
-				dbg!(&window_properties);
+				dbg!(&window_properties.0);
 			}
 			_ => (),
 		}
