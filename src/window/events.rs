@@ -12,11 +12,11 @@ use super::input;
 
 #[derive(Debug, Clone, Copy, Event)]
 pub enum WindowEvent {
-	/// The window was minimized
+	/// The window was minimized, `blur` event on Web
 	Minimized,
-	/// The window was restored
+	/// The window was restored, `focus` event on Web
 	Restored,
-	/// The window was resized
+	/// The window was resized, `ResizeObserver` on Web
 	Resized {
 		/// New width of the window
 		width: f32,
@@ -49,7 +49,7 @@ pub(crate) fn sync_window_properties(mut properties: ResMut<WindowProperties>, m
 pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<WindowProperties>)>, properties: Res<WindowProperties>) {
 	let (first_run, previous) = &mut *first_run;
 
-	if properties.is_changed() || *first_run {
+	if properties.is_changed() && *first_run {
 		if let Some(previous) = previous {
 			if previous.fullscreen != properties.fullscreen {
 				miniquad::window::set_fullscreen(properties.fullscreen);
@@ -63,16 +63,11 @@ pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<Windo
 			if previous.cursor != properties.cursor {
 				miniquad::window::set_mouse_cursor(properties.cursor);
 			}
-		} else {
-			miniquad::window::set_fullscreen(properties.fullscreen);
-			miniquad::window::set_window_size(properties.width, properties.height);
-			miniquad::window::set_cursor_grab(properties.cursor_grabbed);
-			miniquad::window::set_mouse_cursor(properties.cursor);
 		}
 	}
 
 	*previous = Some(*properties);
-	*first_run = false;
+	*first_run = true; // first run is inverted XD
 }
 
 /// Exits the application when the escape key is pressed
@@ -90,7 +85,7 @@ pub fn quit_on_esc(mut keyboard_input: EventReader<input::KeyboardEvent>, mut ap
 /// Closes the application on an [`AppExit`] event
 pub fn quit_on_app_exit(app_exit: EventReader<AppExit>) {
 	if !app_exit.is_empty() {
-		miniquad::window::request_quit();
+		miniquad::window::quit();
 	}
 }
 

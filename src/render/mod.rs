@@ -4,8 +4,8 @@ use vek::rgba;
 
 use crate::window::state;
 
-pub mod camera;
-pub mod render_target;
+pub(crate) mod camera;
+pub(crate) mod render_target;
 
 /// Miniquad rendering backend object. Initialize ONLY after [`miniquad::start`]
 pub struct RenderingBackend(pub(crate) Box<dyn MqdRenderingBackend>);

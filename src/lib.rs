@@ -4,7 +4,7 @@
 pub mod prelude {
 	pub use crate::io::*;
 	pub use crate::render::{camera::*, render_target::*, *};
-	pub use crate::window::{events::*, icon::*, input::*, state::MiniquadDraw, *};
+	pub use crate::window::{events::*, icon::*, input::*, state::*, tick::*, *};
 	pub use crate::QuadifyPlugins;
 
 	pub use bevy_app::prelude::*;

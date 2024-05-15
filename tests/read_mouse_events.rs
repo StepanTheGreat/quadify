@@ -13,7 +13,7 @@ fn main() {
 			resizeable: true,
 			..Default::default()
 		}))
-		.add_systems(Update, read_mouse_events)
+		.add_systems(MiniquadMouseDownEvent, read_mouse_events)
 		.run();
 }
 

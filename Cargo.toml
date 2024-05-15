@@ -9,6 +9,10 @@ keywords = ["bevy", "miniquad"]
 categories = ["game-engines"]
 readme = "README.md"
 
+[[bin]]
+name = "web"
+path = "examples/web.rs"
+
 [dependencies]
 bevy_app = { version = "0.13", default-features = false }
 bevy_ecs = { version = "0.13", default-features = false }
@@ -25,5 +29,4 @@ git = "https://github.com/sokorototo/miniquad-wasm-bindgen"
 features = ["log-impl"]
 
 [dev-dependencies]
-pollster = "0.3.0"
 image = { version = "*", features = ["png"], default-features = false }
