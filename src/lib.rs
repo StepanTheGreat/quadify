@@ -3,7 +3,7 @@
 /// Simplified import for all the crate's types and functions
 pub mod prelude {
 	pub use crate::io::*;
-	pub use crate::render::{camera::*, render_target::*, *};
+	pub use crate::render::{camera::*, *};
 	pub use crate::window::{events::*, icon::*, input::*, state::*, tick::*, *};
 	pub use crate::QuadifyPlugins;
 

@@ -1,11 +1,9 @@
-use bevy_ecs::system::{NonSendMut, Res, Resource};
+use bevy_ecs::system::{NonSendMut, Query, Res, Resource};
 use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 use vek::rgba;
 
 use crate::window::state;
-
-pub(crate) mod camera;
-pub(crate) mod render_target;
+pub mod camera;
 
 /// Miniquad rendering backend object. Initialize ONLY after [`miniquad::start`]
 pub struct RenderingBackend(pub(crate) Box<dyn MqdRenderingBackend>);
@@ -36,9 +34,13 @@ pub(crate) struct RenderBackendPlugin;
 
 impl bevy_app::Plugin for RenderBackendPlugin {
 	fn build(&self, app: &mut bevy_app::App) {
-		app.init_resource::<render_target::MainRenderTarget>()
-			.init_resource::<ClearColor>()
-			.add_systems(state::MiniquadDraw, apply_clear_color);
+		// Setup default camera
+		let camera = camera::Camera2D::default();
+		let id = app.world.spawn((camera, camera::RenderTarget::Window)).id();
+		app.world.insert_resource(camera::CurrentCameraTag(id));
+
+		// Setup the rendering backend
+		app.init_resource::<ClearColor>().add_systems(state::MiniquadDraw, apply_clear_color);
 	}
 }
 
@@ -53,17 +55,21 @@ impl Default for ClearColor {
 	}
 }
 
-fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: Res<ClearColor>, main_render_target: Res<render_target::MainRenderTarget>) {
+fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: Res<ClearColor>, current_camera: Res<camera::CurrentCameraTag>, render_target: Query<&camera::RenderTarget>) {
 	let color = clear_color.as_ref().0;
 	let clear = PassAction::clear_color(color.r, color.g, color.b, color.a);
+	let entity = current_camera.as_ref().0;
 
-	// Clear the screen, or the render target
-	match main_render_target.as_ref().0 {
-		render_target::RenderTarget::Screen(_) => {
-			render_ctx.begin_default_pass(clear);
+	match render_target.get(entity) {
+		Ok(rt) => match rt {
+			camera::RenderTarget::Window => render_ctx.begin_default_pass(clear),
+			camera::RenderTarget::Texture { render_pass, .. } => render_ctx.begin_pass(Some(render_pass.clone()), clear),
+		},
+		Err(e) => {
+			miniquad::error!("Failed to get render target: {:?} on current Camera: {:?}", e, entity);
+			return;
 		}
-		render_target::RenderTarget::Texture { render_pass, .. } => render_ctx.begin_pass(Some(render_pass), clear),
-	}
+	};
 
 	// End the render pass
 	// TODO: Fill the render pass with some basic materials

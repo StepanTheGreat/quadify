@@ -1,8 +1,38 @@
+use bevy_ecs::{component::Component, entity::Entity, system::Resource};
 use vek::{vec2::Vec2, vec3::Vec3, Mat4, Rect};
 
+/// Tag component for the current camera.
+#[derive(Debug, Resource)]
+pub struct CurrentCameraTag(pub Entity);
+
+#[derive(Debug, Component)]
+pub enum RenderTarget {
+	Window,
+	Texture {
+		colour_texture: miniquad::TextureId,
+		depth: Option<miniquad::TextureId>,
+		render_pass: miniquad::RenderPass,
+	},
+}
+
+impl Default for RenderTarget {
+	fn default() -> Self {
+		Self::Window
+	}
+}
+
+impl RenderTarget {
+	pub fn depth_test_enabled(&self) -> bool {
+		match self {
+			Self::Window => false,
+			Self::Texture { depth, .. } => depth.is_some(),
+		}
+	}
+}
+
 /// Main camera that renders to screen
-#[derive(Debug)]
-pub struct MainCamera2D {
+#[derive(Debug, Component)]
+pub struct Camera2D {
 	/// Rotation in degrees.
 	pub rotation: f32,
 	/// Scaling, should be (1.0, 1.0) by default.
@@ -15,19 +45,17 @@ pub struct MainCamera2D {
 	/// Part of the screen to render to.
 	///
 	/// None means the whole screen.
-	///
 	/// Viewport do not affect camera space, just the render position on the screen.
-	///
-	/// Useful for things like splitscreen.
+	/// Useful for things like split-screen.
 	pub viewport: Option<(i32, i32, i32, i32)>,
 }
 
-impl MainCamera2D {
+impl Camera2D {
 	/// Will make camera space equals given rect.
-	pub fn from_display_rect(rect: Rect<f32, f32>) -> MainCamera2D {
+	pub fn from_display_rect(rect: Rect<f32, f32>) -> Camera2D {
 		let target = Vec2::new(rect.x + rect.w / 2., rect.y + rect.h / 2.);
 
-		MainCamera2D {
+		Camera2D {
 			target,
 			zoom: Vec2::new(1. / rect.w * 2., -1. / rect.h * 2.),
 			offset: Vec2::new(0., 0.),
@@ -37,9 +65,9 @@ impl MainCamera2D {
 	}
 }
 
-impl Default for MainCamera2D {
-	fn default() -> MainCamera2D {
-		MainCamera2D {
+impl Default for Camera2D {
+	fn default() -> Camera2D {
+		Camera2D {
 			zoom: Vec2::new(1., 1.),
 			offset: Vec2::new(0., 0.),
 			target: Vec2::new(0., 0.),
@@ -49,24 +77,10 @@ impl Default for MainCamera2D {
 	}
 }
 
-impl MainCamera2D {
+impl Camera2D {
 	fn matrix(&self) -> Mat4<f32> {
 		// gleaned from https://github.com/raysan5/raylib/blob/master/src/core.c#L1528
-
-		// The camera in world-space is set by
-		//   1. Move it to target
-		//   2. Rotate by -rotation and scale by (1/zoom)
-		//      When setting higher scale, it's more intuitive for the world to become bigger (= camera become smaller),
-		//      not for the camera getting bigger, hence the invert. Same deal with rotation.
-		//   3. Move it by (-offset);
-		//      Offset defines target transform relative to screen, but since we're effectively "moving" screen (camera)
-		//      we need to do it into opposite direction (inverse transform)
-
-		// Having camera transform in world-space, inverse of it gives the modelview transform.
-		// Since (A*B*C)' = C'*B'*A', the modelview is
-		//   1. Move to offset
-		//   2. Rotate and Scale
-		//   3. Move by -target
+		// I don't know how it works, but it does.
 		let mat_origin = Mat4::<f32>::translation_3d((-self.target.x, -self.target.y, 0.0));
 		let mat_rotation = Mat4::<f32>::rotation_3d(self.rotation.to_radians(), (0.0, 0.0, 1.0));
 		let mat_scale = Mat4::<f32>::scaling_3d((self.zoom.x, self.zoom.y * -1.0, 1.0));
@@ -80,7 +94,7 @@ impl MainCamera2D {
 	}
 }
 
-impl MainCamera2D {
+impl Camera2D {
 	/// Returns the screen space position for a 2d camera world space position.
 	///
 	/// Screen position in window space - from (0, 0) to (screen_width, screen_height()).
