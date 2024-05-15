@@ -79,6 +79,7 @@ impl EventHandler for QuadifyState {
 		self.app.world.run_schedule(MiniquadQuitRequestedEvent);
 		let cancel_quit = self.app.world.resource::<AcceptQuitRequest>();
 		if !cancel_quit.0 {
+			miniquad::trace!("Cancelling Application Quit");
 			window::cancel_quit()
 		}
 	}

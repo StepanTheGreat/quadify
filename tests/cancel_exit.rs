@@ -1,6 +1,8 @@
-use quadify::prelude::*;
+use bevy_app::AppExit;
 use miniquad::KeyCode;
+use quadify::prelude::*;
 
+#[test]
 fn main() {
 	App::new()
 		.add_plugins(QuadifyPlugins.set(WindowPlugin {
@@ -11,8 +13,12 @@ fn main() {
 			resizeable: false,
 			..Default::default()
 		}))
-		.add_systems(Update, keyboard_events)
 		.add_systems(MiniquadQuitRequestedEvent, toggle_exit)
+		.add_systems(Last, |mut quit: EventReader<AppExit>| {
+			for _ in quit.read() {
+				miniquad::info!("Quit requested");
+			}
+		})
 		.run();
 }
 
@@ -24,15 +30,5 @@ fn toggle_exit(mut first_run: Local<bool>, mut exit_request: ResMut<AcceptQuitRe
 		*first_run = true;
 	} else {
 		exit_request.0 = true;
-	}
-}
-fn keyboard_events(mut events: EventReader<KeyboardEvent>, mut window_properties: ResMut<WindowProperties>) {
-	for event in events.read() {
-		match event {
-			KeyboardEvent::KeyDown { keycode: KeyCode::F, .. } => window_properties.fullscreen = !window_properties.fullscreen,
-			KeyboardEvent::KeyDown { keycode: KeyCode::R, .. } => window_properties.cursor_grabbed = !window_properties.cursor_grabbed,
-			KeyboardEvent::Char { character, .. } if character.is_numeric() => window_properties.width = (character.to_digit(10).unwrap() + 2) * 100,
-			ev => println!("Keyboard Event: {:?}", ev),
-		}
 	}
 }
