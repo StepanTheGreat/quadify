@@ -1,4 +1,4 @@
-use vek::{vec2::Vec2, vec3::Vec3, Mat4, Rect};
+use glam::{Mat4, Vec2, Vec3, Vec4};
 
 /// Main camera that renders to screen
 #[derive(Debug)]
@@ -24,12 +24,13 @@ pub struct MainCamera2D {
 
 impl MainCamera2D {
 	/// Will make camera space equals given rect.
-	pub fn from_display_rect(rect: Rect<f32, f32>) -> MainCamera2D {
-		let target = Vec2::new(rect.x + rect.w / 2., rect.y + rect.h / 2.);
+	pub fn from_display_rect(rect: Vec4) -> MainCamera2D {
+		let (x, y, w, h) = (rect.x, rect.y, rect.z, rect.w);
+		let target = Vec2::new(x + w / 2., y + h / 2.);
 
 		MainCamera2D {
 			target,
-			zoom: Vec2::new(1. / rect.w * 2., -1. / rect.h * 2.),
+			zoom: Vec2::new(1. / w * 2., -1. / h * 2.),
 			offset: Vec2::new(0., 0.),
 			rotation: 0.,
 			viewport: None,

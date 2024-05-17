@@ -13,10 +13,7 @@ readme = "README.md"
 bevy_app = { version = "0.13", default-features = false }
 bevy_ecs = { version = "0.13", default-features = false }
 image = { version = "0", default-features = false }
-vek = { version = "0.16.1", default-features = false, features = [
-	"rgba",
-	"uv",
-] }
+glam = "0.27"
 
 [dependencies.miniquad]
 package = "miniquad_wasm_bindgen"

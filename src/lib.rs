@@ -8,9 +8,8 @@ pub mod prelude {
 	pub use crate::window::{events::*, icon::*, input::*, state::MiniquadDraw, *};
 	pub use crate::QuadifyPlugins;
 
-	pub use bevy_app;
 	pub use miniquad;
-	pub use vek;
+	pub use glam;
 }
 
 pub(crate) mod io;
