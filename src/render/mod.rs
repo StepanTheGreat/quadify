@@ -1,9 +1,6 @@
-use bevy_ecs::{
-	change_detection::DetectChanges,
-	system::{NonSendMut, Res, Resource},
-};
+use bevy_ecs::system::{NonSendMut, Res, Resource};
 use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
-use vek::rgba;
+use glam::{vec3, Vec3};
 
 use crate::window::state;
 
@@ -48,17 +45,18 @@ impl bevy_app::Plugin for RenderBackendPlugin {
 /// Sets the Clear Color of the window
 #[repr(transparent)]
 #[derive(Resource)]
-pub struct ClearColor(pub rgba::Rgba<f32>);
+pub struct ClearColor(pub Vec3);
 
 impl Default for ClearColor {
 	fn default() -> Self {
-		Self(rgba::Rgba::black())
+		Self(vec3(0., 0., 0.))
 	}
 }
 
 fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: Res<ClearColor>, main_render_target: Res<render_target::MainRenderTarget>) {
 	let color = clear_color.as_ref().0;
-	let clear = PassAction::clear_color(color.r, color.g, color.b, color.a);
+	// Using a constant 1 as alpha, because I see no reason to use alpha for color clearing
+	let clear = PassAction::clear_color(color.x, color.y, color.z, 1.0); 
 
 	// Clear the screen, or the render target
 	match main_render_target.as_ref().0 {
