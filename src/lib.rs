@@ -1,5 +1,3 @@
-#![forbid(unsafe_code)]
-
 /// Simplified import for all the crate's types and functions
 pub mod prelude {
 	pub use crate::io::*;

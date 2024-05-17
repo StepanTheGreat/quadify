@@ -88,10 +88,6 @@ impl Camera2D {
 
 		mat_translation * ((mat_scale * mat_rotation) * mat_origin)
 	}
-
-	fn viewport(&self) -> Option<(i32, i32, i32, i32)> {
-		self.viewport
-	}
 }
 
 impl Camera2D {
