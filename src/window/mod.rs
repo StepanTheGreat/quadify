@@ -1,6 +1,6 @@
 use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::ExecutorKind;
-use miniquad::conf::{Conf, Platform};
+use miniquad::conf::{Conf, PlatformSettings};
 
 pub mod events;
 pub mod icon;
@@ -18,7 +18,7 @@ pub struct WindowPlugin {
 	pub icon: Option<icon::WindowIcon>,
 	pub default_cursor: Option<miniquad::CursorIcon>,
 	/// Platform specific settings. See [`miniquad::conf::Platform`]
-	pub platform: Option<Platform>,
+	pub platform: Option<PlatformSettings>,
 }
 
 impl Default for WindowPlugin {
