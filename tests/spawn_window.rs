@@ -1,4 +1,8 @@
+use bevy::prelude::*;
 use quadify::prelude::*;
+use quadify::prelude::WindowPlugin;
+
+use glam::vec3;
 
 #[test]
 fn main() {
@@ -24,5 +28,5 @@ fn main() {
 }
 
 fn set_clear_colour(mut clear_colour: ResMut<ClearColor>) {
-	clear_colour.0 = vek::Rgba::green();
+	clear_colour.0 = vec3(0.0, 1.0, 0.0);
 }

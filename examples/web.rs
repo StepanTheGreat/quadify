@@ -1,4 +1,7 @@
+use bevy_app::prelude::*;
+use bevy_ecs::prelude::*;
 use quadify::prelude::*;
+use quadify::prelude::WindowPlugin;
 
 fn main() {
 	App::new()

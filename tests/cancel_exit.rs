@@ -1,5 +1,7 @@
-use bevy_app::AppExit;
+use bevy::prelude::*;
+use bevy::app::AppExit;
 use quadify::prelude::*;
+use quadify::prelude::WindowPlugin;
 
 #[test]
 fn main() {

@@ -1,4 +1,6 @@
+use bevy::prelude::*;
 use quadify::prelude::*;
+use quadify::prelude::WindowPlugin;
 
 #[test]
 fn main() {

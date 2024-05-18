@@ -1,5 +1,7 @@
+use bevy::prelude::*;
 use miniquad::KeyCode;
 use quadify::prelude::*;
+use quadify::prelude::WindowPlugin;
 
 #[test]
 fn main() {
