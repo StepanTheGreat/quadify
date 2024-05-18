@@ -1,6 +1,6 @@
 use bevy_app::*;
 use bevy_ecs::{event::EventReader, system::ResMut};
-use miniquad::KeyCode;
+use bevy_input::keyboard::{Key, KeyCode, KeyboardInput};
 use quadify::prelude::*;
 
 #[test]
@@ -20,13 +20,24 @@ fn main() {
 		.run();
 }
 
-fn keyboard_events(mut events: EventReader<KeyboardEvent>, mut window_properties: ResMut<WindowProperties>) {
+fn keyboard_events(mut events: EventReader<KeyboardInput>, mut window_properties: ResMut<WindowProperties>) {
 	for event in events.read() {
-		match event {
-			KeyboardEvent::KeyDown { keycode: KeyCode::F, .. } => window_properties.fullscreen = !window_properties.fullscreen,
-			KeyboardEvent::KeyDown { keycode: KeyCode::R, .. } => window_properties.cursor_grabbed = !window_properties.cursor_grabbed,
-			KeyboardEvent::Char { character, .. } if character.is_numeric() => window_properties.width = (character.to_digit(10).unwrap() + 2) * 100,
-			ev => println!("Keyboard Event: {:?}", ev),
+		let kdown = event.state.is_pressed();
+		if kdown {
+			match event.key_code {
+				KeyCode::KeyF => {
+					window_properties.fullscreen = !window_properties.fullscreen;
+					if window_properties.fullscreen {
+						window_properties.width = 600;
+						window_properties.height = 600;
+					}
+				},
+				KeyCode::KeyR => window_properties.cursor_grabbed = !window_properties.cursor_grabbed,
+				_ => println!("Some other keycode")
+			}
+			if let Key::Character(ref char) = event.logical_key {
+				println!("Character key: {:?}", char);
+			}
 		}
 	}
 }
