@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+
+    <head>
+        <link data-trunk rel="rust" data-target-name="web" href="../Cargo.toml">
+        <meta charset="utf-8">
+        <style>
+            html,
+            body {
+                margin: 0px;
+                padding: 0px;
+                width: 100%;
+                height: 100%;
+                overflow: hidden;
+                background: #100f14;
+                z-index: 0;
+            }
+
+            body {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+            }
+
+            h1 {
+                font-family: sans-serif;
+                font-style: italic;
+                text-decoration: underline;
+                color: #fff;
+            }
+
+            canvas {
+                width: 800px;
+                height: 600px;
+                background-color: teal;
+                border: 5px double white;
+                border-radius: 5px;
+            }
+        </style>
+    </head>
+
+    <body>
+        <!-- trunk.rs template html -->
+        <h1>Quadify Web Sample</h1>
+        <canvas id="glcanvas" tabindex='1'></canvas>
+    </body>
+
+</html>

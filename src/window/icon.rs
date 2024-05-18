@@ -39,6 +39,7 @@ impl WindowIcon {
 			miniquad::error!("Failed to decode image: {:?}", err);
 			fs::Error::IOSAssetNoData
 		})?;
+
 		Ok(WindowIcon(img))
 	}
 }

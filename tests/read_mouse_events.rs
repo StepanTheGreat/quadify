@@ -1,5 +1,3 @@
-use bevy_app::prelude::*;
-use bevy_ecs::prelude::*;
 use miniquad::CursorIcon;
 use quadify::prelude::*;
 use vek::rgba;
@@ -15,7 +13,7 @@ fn main() {
 			resizeable: true,
 			..Default::default()
 		}))
-		.add_systems(Update, read_mouse_events)
+		.add_systems(MiniquadMouseDownEvent, read_mouse_events)
 		.run();
 }
 
@@ -46,7 +44,7 @@ fn read_mouse_events(mut events: EventReader<MouseEvent>, mut idx: Local<usize>,
 				}
 				_ => {}
 			},
-			MouseEvent::MouseWheel(..) => {
+			MouseEvent::MouseScroll(..) => {
 				dbg!(&window_properties);
 			}
 			_ => (),

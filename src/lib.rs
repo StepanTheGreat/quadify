@@ -1,11 +1,8 @@
-// ! The current problem is that all bevy systems can be run in parallel, if one
-// ! uses bevy's parallel processing plugin. Macroquad is designed to work on a single thread, thus
-// ! there needs to be some sort of isolation for ALL of its functionality.
-
+/// Simplified import for all the crate's types and functions
 pub mod prelude {
 	pub use crate::io::*;
-	pub use crate::render::{camera::*, render_target::*, *};
-	pub use crate::window::{events::*, icon::*, input::*, state::MiniquadDraw, *};
+	pub use crate::render::{camera::*, *};
+	pub use crate::window::{events::*, icon::*, input::*, state::*, tick::*, *};
 	pub use crate::QuadifyPlugins;
 
 	pub use miniquad;
