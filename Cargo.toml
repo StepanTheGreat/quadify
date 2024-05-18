@@ -17,6 +17,7 @@ path = "examples/web.rs"
 bevy_app = { version = "0.13", default-features = false }
 bevy_ecs = { version = "0.13", default-features = false }
 bevy_log = { version = "0.13", default-features = false, optional = true }
+bevy_input = { version = "0.13", default-features = false }
 
 image = { version = "0", default-features = false }
 glam = "0.25"
@@ -28,6 +29,7 @@ git = "https://github.com/sokorototo/miniquad-wasm-bindgen"
 
 [dev-dependencies]
 image = { version = "*", features = ["png"], default-features = false }
+bevy = { version = "0.13", features = ["multi-threaded"], default-features = false }
 
 [features]
 log = ["bevy_log"]
