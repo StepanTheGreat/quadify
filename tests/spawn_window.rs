@@ -26,5 +26,5 @@ fn main() {
 }
 
 fn set_clear_colour(mut clear_colour: ResMut<ClearColor>) {
-	clear_colour.0 = rgba::Rgba::LIME;
+	clear_colour.0 = rgba::LIME;
 }
