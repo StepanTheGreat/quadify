@@ -16,5 +16,5 @@ fn main() {
 }
 
 fn say_hi() {
-	miniquad::trace!("Hi");
+	println!("Hi");
 }
