@@ -13,6 +13,7 @@ pub(crate) mod io;
 pub(crate) mod render;
 pub(crate) mod window;
 
+use bevy_input::InputPlugin;
 // Create Default plugin bundle
 use bevy_app::{PluginGroup, PluginGroupBuilder};
 
@@ -21,7 +22,10 @@ pub struct QuadifyPlugins;
 
 impl PluginGroup for QuadifyPlugins {
 	fn build(self) -> PluginGroupBuilder {
-		let mut builder = PluginGroupBuilder::start::<Self>().add(render::RenderBackendPlugin).add(window::WindowPlugin::default());
+		let mut builder = PluginGroupBuilder::start::<Self>()
+			.add(InputPlugin)
+			.add(render::RenderBackendPlugin)
+			.add(window::WindowPlugin::default());
 		#[cfg(feature = "log")]
 		{
 			builder = builder.add(bevy_log::LogPlugin::default());
