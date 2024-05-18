@@ -1,6 +1,6 @@
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
-use glam::{vec3, Vec3};
+use glam::vec3;
 use miniquad::CursorIcon;
 use quadify::prelude::*;
 
@@ -45,9 +45,9 @@ fn mouse_events(mut events: EventReader<MouseEvent>, mut idx: Local<usize>, mut 
 				}
 				_ => {}
 			},
-			MouseEvent::MouseWheel(..) => {
+			MouseEvent::MouseScroll(..) => {
 				dbg!(&window_properties);
-			}
+			},
 			_ => (),
 		}
 	}

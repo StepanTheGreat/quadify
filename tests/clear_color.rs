@@ -1,5 +1,8 @@
+use bevy::prelude::*;
 use quadify::prelude::*;
-use vek::rgba;
+
+use quadify::prelude::WindowPlugin;
+use glam::vec3;
 
 #[test]
 fn main() {
@@ -17,5 +20,5 @@ fn main() {
 }
 
 fn clear_colour(mut clear_colour: ResMut<ClearColor>) {
-	clear_colour.0 = rgba::Rgba::new(0.5, 0.5, 0.5, 1.0);
+	clear_colour.0 = vec3(0.5, 0.5, 0.5);
 }
