@@ -2,7 +2,7 @@ use bevy_app::prelude::*;
 use quadify::prelude::*;
 
 fn main() {
-	App::empty()
+	App::new()
 		.add_plugins(QuadifyPlugins.set(WindowPlugin {
 			width: 512,
 			height: 512,
@@ -16,5 +16,5 @@ fn main() {
 }
 
 fn say_hi() {
-	println!("Hi");
+	miniquad::trace!("Hi");
 }

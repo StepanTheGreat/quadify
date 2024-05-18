@@ -1,8 +1,37 @@
 use glam::{Mat4, Quat, Vec2, Vec3, Vec4, EulerRot};
 
+/// Tag component for the current camera.
+#[derive(Debug, Resource)]
+pub struct CurrentCameraTag(pub Entity);
+
+#[derive(Debug, Component)]
+pub enum RenderTarget {
+	Window,
+	Texture {
+		colour_texture: miniquad::TextureId,
+		depth: Option<miniquad::TextureId>,
+		render_pass: miniquad::RenderPass,
+	},
+}
+
+impl Default for RenderTarget {
+	fn default() -> Self {
+		Self::Window
+	}
+}
+
+impl RenderTarget {
+	pub fn depth_test_enabled(&self) -> bool {
+		match self {
+			Self::Window => false,
+			Self::Texture { depth, .. } => depth.is_some(),
+		}
+	}
+}
+
 /// Main camera that renders to screen
-#[derive(Debug)]
-pub struct MainCamera2D {
+#[derive(Debug, Component)]
+pub struct Camera2D {
 	/// Rotation in degrees.
 	pub rotation: f32,
 	/// Scaling, should be (1.0, 1.0) by default.
@@ -15,20 +44,18 @@ pub struct MainCamera2D {
 	/// Part of the screen to render to.
 	///
 	/// None means the whole screen.
-	///
 	/// Viewport do not affect camera space, just the render position on the screen.
-	///
-	/// Useful for things like splitscreen.
+	/// Useful for things like split-screen.
 	pub viewport: Option<(i32, i32, i32, i32)>,
 }
 
-impl MainCamera2D {
+impl Camera2D {
 	/// Will make camera space equals given rect.
 	pub fn from_display_rect(rect: Vec4) -> MainCamera2D {
 		let (x, y, w, h) = (rect.x, rect.y, rect.z, rect.w);
 		let target = Vec2::new(x + w / 2., y + h / 2.);
 
-		MainCamera2D {
+		Camera2D {
 			target,
 			zoom: Vec2::new(1. / w * 2., -1. / h * 2.),
 			offset: Vec2::new(0., 0.),
@@ -38,9 +65,9 @@ impl MainCamera2D {
 	}
 }
 
-impl Default for MainCamera2D {
-	fn default() -> MainCamera2D {
-		MainCamera2D {
+impl Default for Camera2D {
+	fn default() -> Camera2D {
+		Camera2D {
 			zoom: Vec2::new(1., 1.),
 			offset: Vec2::new(0., 0.),
 			target: Vec2::new(0., 0.),
@@ -78,13 +105,9 @@ impl MainCamera2D {
 
 		mat_translation * mat_origin_rot_scale
 	}
-
-	fn viewport(&self) -> Option<(i32, i32, i32, i32)> {
-		self.viewport
-	}
 }
 
-impl MainCamera2D {
+impl Camera2D {
 	/// Returns the screen space position for a 2d camera world space position.
 	///
 	/// Screen position in window space - from (0, 0) to (screen_width, screen_height()).

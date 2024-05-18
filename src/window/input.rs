@@ -5,7 +5,7 @@ pub enum MouseEvent {
 	MouseButtonUp(miniquad::MouseButton, f32, f32),
 	MouseButtonDown(miniquad::MouseButton, f32, f32),
 	MouseMotion(f32, f32),
-	MouseWheel(f32, f32),
+	MouseScroll(f32, f32),
 }
 
 #[derive(Debug, Clone, Copy, Event)]

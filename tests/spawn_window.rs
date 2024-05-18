@@ -1,16 +1,28 @@
-use bevy_app::prelude::*;
 use quadify::prelude::*;
 
 #[test]
 fn main() {
-	App::new()
-		.add_plugins(QuadifyPlugins.set(WindowPlugin {
-			title: "Spawn Window Test".to_string(),
-			width: 600,
-			height: 600,
-			high_dpi: true,
-			resizeable: false,
-			..Default::default()
-		}))
-		.run();
+	WindowIcon::from_file(
+		"tests/peashooter2.png",
+		|icon| {
+			let icon = icon.unwrap();
+
+			let window = WindowPlugin {
+				title: "Spawn Window with Icon".to_string(),
+				width: 600,
+				height: 600,
+				high_dpi: true,
+				resizeable: false,
+				icon: Some(icon),
+				..Default::default()
+			};
+
+			App::new().add_plugins(QuadifyPlugins.set(window)).add_systems(Startup, set_clear_colour).run();
+		},
+		None,
+	);
+}
+
+fn set_clear_colour(mut clear_colour: ResMut<ClearColor>) {
+	clear_colour.0 = vek::Rgba::green();
 }

@@ -2,10 +2,11 @@ use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::ExecutorKind;
 use miniquad::conf::{Conf, PlatformSettings};
 
-pub mod events;
-pub mod icon;
-pub mod input;
-pub mod state;
+pub(crate) mod events;
+pub(crate) mod icon;
+pub(crate) mod input;
+pub(crate) mod state;
+pub(crate) mod tick;
 
 /// Initializes main window and starts the `miniquad` event loop.
 pub struct WindowPlugin {
@@ -51,13 +52,11 @@ impl Plugin for WindowPlugin {
 		conf.window_resizable = self.resizeable;
 
 		if let Some(icon) = &self.icon {
-			// TODO: Log when Icon conversion fails
 			conf.icon = icon.try_into().ok();
 		}
 
 		if let Some(platform) = &self.platform {
-			// SAFETY: There is no reason Platform doesn't implement Copy or Clone. It's static configuration data
-			conf.platform = unsafe { std::mem::transmute_copy(platform) };
+			conf.platform = platform.clone();
 		}
 
 		let window_properties = events::WindowProperties {
@@ -75,11 +74,32 @@ impl Plugin for WindowPlugin {
 			.add_event::<input::TouchEvent>()
 			.add_event::<input::KeyboardEvent>()
 			.insert_resource(window_properties)
+			.insert_resource(tick::GameTick(0))
+			.insert_resource(state::AcceptQuitRequest(true))
 			.init_schedule(state::MiniquadDraw)
 			.edit_schedule(state::MiniquadDraw, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.add_systems(Last, (events::enforce_window_properties, events::update_window_properties, events::quit_on_app_exit));
+			.init_schedule(state::MiniquadKeyDownEvent)
+			.edit_schedule(state::MiniquadKeyDownEvent, |s| {
+				s.set_executor_kind(ExecutorKind::SingleThreaded);
+			})
+			.init_schedule(state::MiniquadMouseDownEvent)
+			.edit_schedule(state::MiniquadMouseDownEvent, |s| {
+				s.set_executor_kind(ExecutorKind::SingleThreaded);
+			})
+			.init_schedule(state::MiniquadMouseMotionEvent)
+			.edit_schedule(state::MiniquadMouseMotionEvent, |s| {
+				s.set_executor_kind(ExecutorKind::SingleThreaded);
+			})
+			.init_schedule(state::MiniquadQuitRequestedEvent)
+			.edit_schedule(state::MiniquadQuitRequestedEvent, |s| {
+				s.set_executor_kind(ExecutorKind::SingleThreaded);
+			})
+			.add_systems(
+				Last,
+				(events::enforce_window_properties, events::sync_window_properties, events::quit_on_app_exit, tick::update_game_tick),
+			);
 
 		// Init Runner
 		app.set_runner(move |app| {

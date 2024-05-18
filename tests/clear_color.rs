@@ -1,5 +1,3 @@
-use bevy_app::prelude::{App, PluginGroup, Startup};
-use bevy_ecs::prelude::ResMut;
 use quadify::prelude::*;
 use vek::rgba;
 
