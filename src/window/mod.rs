@@ -60,12 +60,15 @@ impl Plugin for WindowPlugin {
 			conf.platform = platform.clone();
 		}
 
+		let window_entity = app.world.spawn(()).id();
+
 		let window_properties = events::WindowProperties {
 			fullscreen: self.fullscreen,
 			width: self.width as u32,
 			height: self.height as u32,
 			cursor_grabbed: false,
 			cursor: miniquad::CursorIcon::Default,
+			window: window_entity,
 		};
 
 		// Init Resources, Events, and Systems
