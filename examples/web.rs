@@ -19,7 +19,6 @@ fn main() {
 #[allow(unused_variables)]
 fn read_keyboard(mut keyboard_events: EventReader<KeyboardEvent>, tick: Res<GameTick>) {
 	for event in keyboard_events.read() {
-		#[cfg(feature = "log")]
-		bevy_log::info!("Received Event: {:?} GameTick: {}", event, tick.0);
+		println!("Received Event: {:?} GameTick: {}", event, tick.0);
 	}
 }

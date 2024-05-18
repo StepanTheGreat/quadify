@@ -6,3 +6,7 @@ pub struct Rgba {
 	pub b: f32,
 	pub a: f32,
 }
+
+pub fn rgba(r: f32, g: f32, b: f32, a: f32) -> Rgba {
+	Rgba { r, g, b, a }
+}

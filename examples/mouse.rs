@@ -1,6 +1,5 @@
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
-use glam::vec3;
 use miniquad::CursorIcon;
 use quadify::prelude::*;
 
@@ -34,7 +33,7 @@ fn mouse_events(mut events: EventReader<MouseEvent>, mut idx: Local<usize>, mut 
 		match event {
 			MouseEvent::MouseButtonDown(btn, x, y) => match btn {
 				miniquad::MouseButton::Right => {
-					clear_colour.0 = vec3(x / 600.0, y / 600.0, 0.5);
+					clear_colour.0 = rgba::rgba(x / 600.0, y / 600.0, 0.5, 1.0);
 				}
 				miniquad::MouseButton::Left => {
 					window_properties.cursor_grabbed = !window_properties.cursor_grabbed;
@@ -47,7 +46,7 @@ fn mouse_events(mut events: EventReader<MouseEvent>, mut idx: Local<usize>, mut 
 			},
 			MouseEvent::MouseScroll(..) => {
 				dbg!(&window_properties);
-			},
+			}
 			_ => (),
 		}
 	}

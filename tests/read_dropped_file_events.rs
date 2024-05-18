@@ -1,6 +1,6 @@
-use bevy::prelude::*;
+use bevy_app::*;
+use bevy_ecs::event::EventReader;
 use quadify::prelude::*;
-use quadify::prelude::WindowPlugin;
 
 #[test]
 fn main() {

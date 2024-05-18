@@ -1,7 +1,7 @@
-use bevy::prelude::*;
+use bevy_app::*;
+use bevy_ecs::{event::EventReader, system::ResMut};
 use miniquad::KeyCode;
 use quadify::prelude::*;
-use quadify::prelude::WindowPlugin;
 
 #[test]
 fn main() {

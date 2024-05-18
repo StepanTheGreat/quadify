@@ -1,6 +1,6 @@
-use bevy::prelude::*;
+use bevy_app::*;
+use bevy_ecs::{event::EventReader, system::Res};
 use quadify::prelude::*;
-use quadify::prelude::WindowPlugin;
 
 #[test]
 fn main() {
@@ -19,6 +19,6 @@ fn main() {
 
 fn read_events(mut events: EventReader<WindowEvent>, tick: Res<GameTick>) {
 	for event in events.read() {
-		miniquad::info!("[{}], {:?}", tick.0, event)
+		println!("[{}], {:?}", tick.0, event)
 	}
 }

@@ -1,7 +1,9 @@
-use bevy::prelude::*;
-use bevy::app::AppExit;
+use bevy_app::*;
+use bevy_ecs::{
+	event::EventReader,
+	system::{Local, Res, ResMut},
+};
 use quadify::prelude::*;
-use quadify::prelude::WindowPlugin;
 
 #[test]
 fn main() {
@@ -15,13 +17,13 @@ fn main() {
 			..Default::default()
 		}))
 		.add_systems(Startup, || {
-			miniquad::info!("User needs to attempt Quitting the application twice to exit.");
+			println!("User needs to attempt Quitting the application twice to exit.");
 		})
 		.add_systems(MiniquadQuitRequestedEvent, toggle_exit)
 		// Run a System just before the application Quits
 		.add_systems(Last, |mut quit: EventReader<AppExit>, tick: Res<GameTick>| {
 			for _ in quit.read() {
-				miniquad::info!("[{}] Quit Permitted, Bye Folks!", tick.0);
+				println!("[{}] Quit Permitted, Bye Folks!", tick.0);
 			}
 		})
 		.run();
@@ -31,11 +33,11 @@ fn toggle_exit(mut first_run: Local<bool>, mut exit_request: ResMut<AcceptQuitRe
 	let f_run = !*first_run; // defaults to false
 
 	if f_run {
-		miniquad::trace!("[{}] Cancelling Exit", tick.0);
+		println!("[{}] Cancelling Exit", tick.0);
 		exit_request.0 = false;
 		*first_run = true; // Inverted
 	} else {
-		miniquad::trace!("[{}] Permitting Exit", tick.0);
+		println!("[{}] Permitting Exit", tick.0);
 		exit_request.0 = true;
 	}
 }

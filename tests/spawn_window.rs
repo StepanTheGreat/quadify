@@ -1,8 +1,6 @@
-use bevy::prelude::*;
+use bevy_app::*;
+use bevy_ecs::system::ResMut;
 use quadify::prelude::*;
-use quadify::prelude::WindowPlugin;
-
-use glam::vec3;
 
 #[test]
 fn main() {
@@ -28,5 +26,5 @@ fn main() {
 }
 
 fn set_clear_colour(mut clear_colour: ResMut<ClearColor>) {
-	clear_colour.0 = vec3(0.0, 1.0, 0.0);
+	clear_colour.0 = rgba::rgba(0.0, 1.0, 0.0, 1.0);
 }
