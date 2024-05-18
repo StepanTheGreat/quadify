@@ -1,10 +1,10 @@
 use bevy_ecs::system::{NonSendMut, Query, Res, Resource};
-use glam::{vec3, Vec3};
 use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 
 use crate::window::state;
 pub mod camera;
 pub mod pipeline;
+pub mod rgba;
 
 /// Miniquad rendering backend object.
 pub struct RenderingBackend {
@@ -73,14 +73,8 @@ impl RenderingBackend {
 
 /// Sets the Clear Color of the window
 #[repr(transparent)]
-#[derive(Resource)]
-pub struct ClearColor(pub Vec3);
-
-impl Default for ClearColor {
-	fn default() -> Self {
-		Self(vec3(0., 0., 0.))
-	}
-}
+#[derive(Resource, Default)]
+pub struct ClearColor(pub rgba::Rgba);
 
 fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: Res<ClearColor>, current_camera: Res<camera::CurrentCameraTag>, render_target: Query<&camera::RenderTarget>) {
 	// Begin the render pass
