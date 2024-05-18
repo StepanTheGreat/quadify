@@ -1,4 +1,5 @@
-use glam::{Mat4, Quat, Vec2, Vec3, Vec4, EulerRot};
+use bevy_ecs::{component::Component, entity::Entity, system::Resource};
+use glam::{EulerRot, Mat4, Quat, Vec2, Vec3, Vec4};
 
 /// Tag component for the current camera.
 #[derive(Debug, Resource)]
@@ -51,7 +52,7 @@ pub struct Camera2D {
 
 impl Camera2D {
 	/// Will make camera space equals given rect.
-	pub fn from_display_rect(rect: Vec4) -> MainCamera2D {
+	pub fn from_display_rect(rect: Vec4) -> Camera2D {
 		let (x, y, w, h) = (rect.x, rect.y, rect.z, rect.w);
 		let target = Vec2::new(x + w / 2., y + h / 2.);
 
@@ -77,28 +78,13 @@ impl Default for Camera2D {
 	}
 }
 
-impl MainCamera2D {
+impl Camera2D {
 	fn matrix(&self) -> Mat4 {
 		// gleaned from https://github.com/raysan5/raylib/blob/master/src/core.c#L1528
-
-		// The camera in world-space is set by
-		//   1. Move it to target
-		//   2. Rotate by -rotation and scale by (1/zoom)
-		//      When setting higher scale, it's more intuitive for the world to become bigger (= camera become smaller),
-		//      not for the camera getting bigger, hence the invert. Same deal with rotation.
-		//   3. Move it by (-offset);
-		//      Offset defines target transform relative to screen, but since we're effectively "moving" screen (camera)
-		//      we need to do it into opposite direction (inverse transform)
-
-		// Having camera transform in world-space, inverse of it gives the modelview transform.
-		// Since (A*B*C)' = C'*B'*A', the modelview is
-		//   1. Move to offset
-		//   2. Rotate and Scale
-		//   3. Move by -target
 		let mat_origin_rot_scale = Mat4::from_scale_rotation_translation(
 			Vec3::new(self.zoom.x, self.zoom.y * -1.0, 1.0),
 			Quat::from_euler(EulerRot::XYZ, 0.0, 0.0, self.rotation.to_radians()),
-			Vec3::new(-self.target.x, -self.target.y, 0.)
+			Vec3::new(-self.target.x, -self.target.y, 0.),
 		);
 
 		let mat_translation = Mat4::from_translation(Vec3::new(self.offset.x, self.offset.y, 0.0));
