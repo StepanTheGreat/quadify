@@ -1,6 +1,7 @@
 use bevy_app::*;
 use bevy_ecs::system::ResMut;
 use quadify::prelude::*;
+use quadify::prelude::rgba;
 
 #[test]
 fn main() {
@@ -18,5 +19,5 @@ fn main() {
 }
 
 fn clear_colour(mut clear_colour: ResMut<ClearColor>) {
-	clear_colour.0 = rgba::rgba(0.5, 0.5, 0.5, 0.0);
+	clear_colour.0 = rgba::GRAY;
 }
