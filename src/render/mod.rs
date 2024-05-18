@@ -1,6 +1,6 @@
 use bevy_ecs::system::{NonSendMut, Query, Res, Resource};
-use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 use glam::{vec3, Vec3};
+use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 
 use crate::window::state;
 pub mod camera;
@@ -67,7 +67,7 @@ impl RenderingBackend {
 		self.draw_calls_count = 0;
 	}
 
-	pub(crate) fn draw(&mut self, projection: vek::Mat4<f32>) {}
+	pub(crate) fn draw(&mut self, projection: glam::Mat4) {}
 	pub fn set_camera(&mut self, camera: camera::Camera2D) {}
 }
 
