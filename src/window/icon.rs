@@ -35,9 +35,9 @@ impl WindowIcon {
 			None => image::io::Reader::new(data).with_guessed_format().map_err(fs::Error::IOError)?,
 		};
 
-		let img = reader.decode().map_err(|err| {
+		let img = reader.decode().map_err(|_err| {
 			#[cfg(feature = "log")]
-			bevy_log::error!("Failed to decode image: {:?}", err);
+			bevy_log::error!("Failed to decode image: {:?}", _err);
 			fs::Error::IOSAssetNoData
 		})?;
 

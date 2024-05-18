@@ -3,6 +3,7 @@ use std::path::PathBuf;
 use bevy_app::AppExit;
 use bevy_ecs::{
 	change_detection::{DetectChanges, DetectChangesMut},
+	entity::Entity,
 	event::{Event, EventReader, EventWriter},
 	system::{Local, Res, ResMut, Resource},
 };
@@ -34,6 +35,8 @@ pub struct WindowProperties {
 	pub height: u32,
 	pub cursor_grabbed: bool,
 	pub cursor: CursorIcon,
+	/// An empty entity that's used to identify the main window. Since `miniquad` doesn't support multiwindow.
+	pub window: Entity,
 }
 
 pub(crate) fn sync_window_properties(mut properties: ResMut<WindowProperties>, mut window_events: EventReader<WindowEvent>) {
