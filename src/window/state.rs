@@ -75,12 +75,7 @@ impl EventHandler for QuadifyState {
 
 	fn quit_requested_event(&mut self) -> bool {
 		self.app.world.run_schedule(MiniquadQuitRequestedEvent);
-
-		let quit = self.app.world.resource::<AcceptQuitRequest>().0;
-		if quit {
-			self.app.world.send_event(AppExit);
-		}
-		quit
+		self.app.world.resource::<AcceptQuitRequest>().0
 	}
 
 	// File Drag and Drop

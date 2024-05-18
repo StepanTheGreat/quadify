@@ -5,8 +5,8 @@ pub mod prelude {
 	pub use crate::window::{events::*, icon::*, input::*, state::*, tick::*, *};
 	pub use crate::QuadifyPlugins;
 
-	pub use miniquad;
 	pub use glam;
+	pub use miniquad;
 }
 
 pub(crate) mod io;
@@ -21,6 +21,11 @@ pub struct QuadifyPlugins;
 
 impl PluginGroup for QuadifyPlugins {
 	fn build(self) -> PluginGroupBuilder {
-		PluginGroupBuilder::start::<Self>().add(render::RenderBackendPlugin).add(window::WindowPlugin::default())
+		let mut builder = PluginGroupBuilder::start::<Self>().add(render::RenderBackendPlugin).add(window::WindowPlugin::default());
+		#[cfg(feature = "log")]
+		{
+			builder = builder.add(bevy_log::LogPlugin::default());
+		}
+		builder
 	}
 }

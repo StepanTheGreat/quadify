@@ -88,7 +88,8 @@ fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: 
 			camera::RenderTarget::Texture { render_pass, .. } => render_ctx.begin_pass(Some(render_pass.clone()), clear),
 		},
 		Err(e) => {
-			miniquad::error!("Failed to get render target: {:?} on current Camera: {:?}", e, entity);
+			#[cfg(feature = "log")]
+			bevy_log::error!("Failed to get render target: {:?} on current Camera: {:?}", e, entity);
 			return;
 		}
 	};

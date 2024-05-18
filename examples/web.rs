@@ -1,12 +1,11 @@
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
 use quadify::prelude::*;
-use quadify::prelude::WindowPlugin;
 
 fn main() {
 	App::new()
 		.add_plugins(QuadifyPlugins.set(WindowPlugin {
-			title: "Read Mouse Events Test".to_string(),
+			title: "Read Keyboard Events Test".to_string(),
 			width: 600,
 			height: 600,
 			high_dpi: true,
@@ -17,8 +16,10 @@ fn main() {
 		.run();
 }
 
+#[allow(unused_variables)]
 fn read_keyboard(mut keyboard_events: EventReader<KeyboardEvent>, tick: Res<GameTick>) {
 	for event in keyboard_events.read() {
-		miniquad::info!("Received Event: {:?} GameTick: {}", event, tick.0);
+		#[cfg(feature = "log")]
+		bevy_log::info!("Received Event: {:?} GameTick: {}", event, tick.0);
 	}
 }

@@ -36,7 +36,8 @@ impl WindowIcon {
 		};
 
 		let img = reader.decode().map_err(|err| {
-			miniquad::error!("Failed to decode image: {:?}", err);
+			#[cfg(feature = "log")]
+			bevy_log::error!("Failed to decode image: {:?}", err);
 			fs::Error::IOSAssetNoData
 		})?;
 
