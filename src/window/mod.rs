@@ -7,6 +7,7 @@ pub(crate) mod icon;
 pub(crate) mod input;
 pub(crate) mod state;
 pub(crate) mod tick;
+mod conversions;
 
 /// Initializes main window and starts the `miniquad` event loop.
 pub struct WindowPlugin {

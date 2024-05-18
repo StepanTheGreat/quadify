@@ -6,9 +6,8 @@ use bevy_ecs::{
 	event::{Event, EventReader, EventWriter},
 	system::{Local, Res, ResMut, Resource},
 };
+use bevy_input::keyboard::{KeyCode, KeyboardInput};
 use miniquad::CursorIcon;
-
-use super::input;
 
 #[derive(Debug, Clone, Copy, Event)]
 pub enum WindowEvent {
@@ -71,12 +70,9 @@ pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<Windo
 }
 
 /// Exits the application when the escape key is pressed
-pub fn quit_on_esc(mut keyboard_input: EventReader<input::KeyboardEvent>, mut app_exit: EventWriter<AppExit>) {
+pub fn quit_on_esc(mut keyboard_input: EventReader<KeyboardInput>, mut app_exit: EventWriter<AppExit>) {
 	for event in keyboard_input.read() {
-		if let input::KeyboardEvent::KeyDown {
-			keycode: miniquad::KeyCode::Escape, ..
-		} = event
-		{
+		if event.state.is_pressed() && event.key_code == KeyCode::Escape {
 			app_exit.send(AppExit);
 		}
 	}
