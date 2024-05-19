@@ -1,5 +1,6 @@
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
+use bevy_input::keyboard::KeyboardInput;
 use quadify::prelude::*;
 
 fn main() {
@@ -17,7 +18,7 @@ fn main() {
 }
 
 #[allow(unused_variables)]
-fn read_keyboard(mut keyboard_events: EventReader<KeyboardEvent>, tick: Res<GameTick>) {
+fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>, tick: Res<GameTick>) {
 	for event in keyboard_events.read() {
 		println!("Received Event: {:?} GameTick: {}", event, tick.0);
 	}

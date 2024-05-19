@@ -2,11 +2,15 @@
 pub mod prelude {
 	pub use crate::io::*;
 	pub use crate::render::{camera::*, *};
-	pub use crate::window::{events::*, icon::*, input::*, state::*, tick::*, *};
+	pub use crate::window::{events::*, icon::*, state::*, tick::*, *};
 	pub use crate::QuadifyPlugins;
 
 	pub use glam;
 	pub use miniquad;
+}
+
+pub mod color {
+	pub use crate::render::rgba::*;
 }
 
 pub(crate) mod io;

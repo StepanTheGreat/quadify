@@ -4,7 +4,6 @@ use miniquad::conf::{Conf, PlatformSettings};
 
 pub(crate) mod events;
 pub(crate) mod icon;
-pub(crate) mod input;
 pub(crate) mod state;
 pub(crate) mod tick;
 mod conversions;
@@ -74,9 +73,6 @@ impl Plugin for WindowPlugin {
 		// Init Resources, Events, and Systems
 		app.add_event::<events::WindowEvent>()
 			.add_event::<events::DroppedFileEvent>()
-			.add_event::<input::MouseEvent>()
-			.add_event::<input::TouchEvent>()
-			.add_event::<input::KeyboardEvent>()
 			.insert_resource(window_properties)
 			.insert_resource(tick::GameTick(0))
 			.insert_resource(state::AcceptQuitRequest(true))
