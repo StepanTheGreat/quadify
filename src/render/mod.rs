@@ -2,9 +2,11 @@ use bevy_ecs::system::{NonSendMut, Query, Res, Resource};
 use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 
 use crate::window::state;
+
 pub mod camera;
 pub mod pipeline;
 pub mod rgba;
+pub mod geometry;
 
 /// Miniquad rendering backend object.
 pub struct RenderingBackend {
@@ -68,6 +70,7 @@ impl RenderingBackend {
 	}
 
 	pub(crate) fn draw(&mut self, projection: glam::Mat4) {}
+	
 	pub fn set_camera(&mut self, camera: camera::Camera2D) {}
 }
 
@@ -75,6 +78,22 @@ impl RenderingBackend {
 #[repr(transparent)]
 #[derive(Resource, Default)]
 pub struct ClearColor(pub rgba::Rgba);
+
+/// Plugin responsible for initializing the [`RenderBackend`](MqdRenderingBackend)
+pub(crate) struct RenderBackendPlugin;
+impl bevy_app::Plugin for RenderBackendPlugin {
+	fn build(&self, app: &mut bevy_app::App) {
+		// Setup default camera
+		let camera = camera::Camera2D::default();
+		let id = app.world.spawn((camera, camera::RenderTarget::Window)).id();
+		// Setup the rendering backend
+		app
+			.insert_resource(camera::CurrentCameraTag(id))
+			.init_resource::<ClearColor>()
+			.add_systems(state::MiniquadPrepareDraw, apply_clear_color)
+			.add_systems(state::MiniquadEndDraw, commit_frame);
+	}
+}
 
 fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: Res<ClearColor>, current_camera: Res<camera::CurrentCameraTag>, render_target: Query<&camera::RenderTarget>) {
 	// Begin the render pass
@@ -99,17 +118,7 @@ fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: 
 	render_ctx.end_render_pass();
 }
 
-/// Plugin responsible for initializing the [`RenderBackend`](MqdRenderingBackend)
-pub(crate) struct RenderBackendPlugin;
-
-impl bevy_app::Plugin for RenderBackendPlugin {
-	fn build(&self, app: &mut bevy_app::App) {
-		// Setup default camera
-		let camera = camera::Camera2D::default();
-		let id = app.world.spawn((camera, camera::RenderTarget::Window)).id();
-		app.world.insert_resource(camera::CurrentCameraTag(id));
-
-		// Setup the rendering backend
-		app.init_resource::<ClearColor>().add_systems(state::MiniquadDraw, apply_clear_color);
-	}
+/// Commit the rendered frame
+fn commit_frame(mut render_ctx: NonSendMut<RenderingBackend>) {
+	render_ctx.commit_frame();
 }

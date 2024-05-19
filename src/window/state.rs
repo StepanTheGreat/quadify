@@ -31,6 +31,14 @@ impl QuadifyState {
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, ScheduleLabel)]
 pub struct MiniquadDraw;
 
+/// Almost the same as [`MiniquadDraw`], but is for general preparation like screen and depth clearing, runs before [`MiniquadDraw`]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, ScheduleLabel)]
+pub struct MiniquadPrepareDraw;
+
+/// Almost the same as [`MiniquadDraw`], but is only used to commit the framebuffer to the screen. Don't use it
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, ScheduleLabel)]
+pub struct MiniquadEndDraw;
+
 /// Special Schedule called directly inside the Mouse Event handler.
 /// Allows users to run higher privilege code on the Web, as the Systems are run in the event listener's context.
 /// Use this, [`MiniquadMouseMotionEvent`] and the [`MiniquadKeyDownEvent`] Schedule to call `requestFullScreen` and other such Web APIs.
@@ -65,6 +73,7 @@ impl EventHandler for QuadifyState {
 
 	// Called on every frame if App has an active surface
 	fn draw(&mut self) {
+		self.app.world.run_schedule(MiniquadPrepareDraw);
 		self.app.world.run_schedule(MiniquadDraw);
 	}
 

@@ -76,8 +76,16 @@ impl Plugin for WindowPlugin {
 			.insert_resource(window_properties)
 			.insert_resource(tick::GameTick(0))
 			.insert_resource(state::AcceptQuitRequest(true))
+			.init_schedule(state::MiniquadPrepareDraw)
+			.edit_schedule(state::MiniquadPrepareDraw, |s| {
+				s.set_executor_kind(ExecutorKind::SingleThreaded);
+			})
 			.init_schedule(state::MiniquadDraw)
 			.edit_schedule(state::MiniquadDraw, |s| {
+				s.set_executor_kind(ExecutorKind::SingleThreaded);
+			})
+			.init_schedule(state::MiniquadEndDraw)
+			.edit_schedule(state::MiniquadEndDraw, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
 			.init_schedule(state::MiniquadKeyDownEvent)
