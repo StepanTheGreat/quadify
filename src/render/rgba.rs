@@ -1,4 +1,5 @@
 /// RGBA color struct
+#[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Rgba {
 	pub r: f32,
