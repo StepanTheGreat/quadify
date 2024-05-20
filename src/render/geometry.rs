@@ -24,9 +24,9 @@ impl Vertex {
     /// Default's vertex attributes constant
     pub const fn attributes() -> [VertexAttribute; 3] {
         [
-            VertexAttribute::new("in_pos", VertexFormat::Float3),
-            VertexAttribute::new("in_uv", VertexFormat::Float2),
-            VertexAttribute::new("in_color", VertexFormat::Float4)
+            VertexAttribute::new("position", VertexFormat::Float3),
+            VertexAttribute::new("texcoord", VertexFormat::Float2),
+            VertexAttribute::new("color0", VertexFormat::Byte4)
         ]
     }
 }
@@ -71,7 +71,7 @@ impl Mesh {
 
             if i > 0 && i < npoints-1 {
                 let i = i as u16;
-                indices.append(&mut vec![i, 0, i+1]);
+                indices.append(&mut vec![0, i, i+1]);
             }
         }
 
