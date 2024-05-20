@@ -1,7 +1,6 @@
-use bevy::input::mouse::{MouseButtonInput, MouseMotion, MouseWheel};
-use bevy::prelude::*;
-use bevy_app::AppExit;
-use quadify::prelude::WindowPlugin;
+use bevy_app::{prelude::*, AppExit};
+use bevy_ecs::prelude::*;
+use bevy_input::{mouse::*, prelude::*};
 use quadify::prelude::*;
 
 const INPUT_NEEDED: u32 = 4;

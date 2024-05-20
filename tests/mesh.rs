@@ -1,10 +1,10 @@
 /// This test should be changed in the future to use more higher-level functionality like `Material`s, to avoid writing repetitive shaders;
 /// Thus this test is only for mesh demonstration purposes.
-use bevy::prelude::*;
+
+use bevy_app::*;
+use bevy_ecs::prelude::*;
+
 use miniquad::*;
-use quadify::prelude::geometry::Vertex;
-use quadify::prelude::RenderingBackend;
-use quadify::prelude::WindowPlugin;
 use quadify::{color, prelude::*};
 
 struct RenderState {

@@ -17,9 +17,8 @@ fn main() {
 		.run();
 }
 
-#[allow(unused_variables)]
-fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>, tick: Res<GameTick>) {
+fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>) {
 	for event in keyboard_events.read() {
-		println!("Received Event: {:?} GameTick: {}", event, tick.0);
+		println!("Received Event: {:?}", event);
 	}
 }

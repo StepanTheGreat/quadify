@@ -16,28 +16,29 @@ fn main() {
 			resizeable: false,
 			..Default::default()
 		}))
+		.add_plugins(bevy_time::TimePlugin::default())
 		.add_systems(Startup, || {
 			println!("User needs to attempt Quitting the application twice to exit.");
 		})
 		.add_systems(MiniquadQuitRequestedEvent, toggle_exit)
 		// Run a System just before the application Quits
-		.add_systems(Last, |mut quit: EventReader<AppExit>, tick: Res<GameTick>| {
+		.add_systems(Last, |mut quit: EventReader<AppExit>, tick: Res<bevy_time::Time>| {
 			for _ in quit.read() {
-				println!("[{}] Quit Permitted, Bye Folks!", tick.0);
+				println!("[{}] Quit Permitted, Bye Folks!", tick.elapsed_seconds());
 			}
 		})
 		.run();
 }
 
-fn toggle_exit(mut first_run: Local<bool>, mut exit_request: ResMut<AcceptQuitRequest>, tick: Res<GameTick>) {
+fn toggle_exit(mut first_run: Local<bool>, mut exit_request: ResMut<AcceptQuitRequest>, tick: Res<bevy_time::Time>) {
 	let f_run = !*first_run; // defaults to false
 
 	if f_run {
-		println!("[{}] Cancelling Exit", tick.0);
+		println!("[{}] Cancelling Exit", tick.elapsed_seconds());
 		exit_request.0 = false;
 		*first_run = true; // Inverted
 	} else {
-		println!("[{}] Permitting Exit", tick.0);
+		println!("[{}] Permitting Exit", tick.elapsed_seconds());
 		exit_request.0 = true;
 	}
 }
