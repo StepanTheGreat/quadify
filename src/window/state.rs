@@ -94,7 +94,7 @@ impl EventHandler for QuadifyState {
 		if let Some(accept_quit) = self.app.world.get_resource::<AcceptQuitRequest>() {
 			accept_quit.0
 		} else {
-			true
+			false
 		}
 	}
 
