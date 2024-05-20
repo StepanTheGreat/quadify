@@ -2,11 +2,10 @@ use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::ExecutorKind;
 use miniquad::conf::{Conf, PlatformSettings};
 
+mod conversions;
 pub(crate) mod events;
 pub(crate) mod icon;
 pub(crate) mod state;
-pub(crate) mod tick;
-mod conversions;
 
 /// Initializes main window and starts the `miniquad` event loop.
 pub struct WindowPlugin {
@@ -74,7 +73,6 @@ impl Plugin for WindowPlugin {
 		app.add_event::<events::WindowEvent>()
 			.add_event::<events::DroppedFileEvent>()
 			.insert_resource(window_properties)
-			.insert_resource(tick::GameTick(0))
 			.insert_resource(state::AcceptQuitRequest(true))
 			.init_schedule(state::MiniquadPrepareDraw)
 			.edit_schedule(state::MiniquadPrepareDraw, |s| {
@@ -104,10 +102,7 @@ impl Plugin for WindowPlugin {
 			.edit_schedule(state::MiniquadQuitRequestedEvent, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.add_systems(
-				Last,
-				(events::enforce_window_properties, events::sync_window_properties, events::quit_on_app_exit, tick::update_game_tick),
-			);
+			.add_systems(Last, (events::enforce_window_properties, events::sync_window_properties, events::quit_on_app_exit));
 
 		// Init Runner
 		app.set_runner(move |app| {

@@ -36,7 +36,7 @@ fn mouse_events(mut events: EventReader<MouseButtonInput>, mut idx: Local<usize>
 				clear_colour.0 = rgba::GREEN;
 			}
 			MouseButton::Left => {
-					window_properties.cursor_grabbed = !window_properties.cursor_grabbed;
+				window_properties.cursor_grabbed = !window_properties.cursor_grabbed;
 			}
 			MouseButton::Middle => {
 				*idx = (*idx + 1) % CURSORS.len();

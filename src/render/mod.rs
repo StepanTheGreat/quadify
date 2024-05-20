@@ -4,9 +4,9 @@ use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 use crate::window::state;
 
 pub mod camera;
+pub mod geometry;
 pub mod pipeline;
 pub mod rgba;
-pub mod geometry;
 
 /// Miniquad rendering backend object.
 pub struct RenderingBackend {
@@ -70,7 +70,7 @@ impl RenderingBackend {
 	}
 
 	pub(crate) fn draw(&mut self, projection: glam::Mat4) {}
-	
+
 	pub fn set_camera(&mut self, camera: camera::Camera2D) {}
 }
 
@@ -87,8 +87,7 @@ impl bevy_app::Plugin for RenderBackendPlugin {
 		let camera = camera::Camera2D::default();
 		let id = app.world.spawn((camera, camera::RenderTarget::Window)).id();
 		// Setup the rendering backend
-		app
-			.insert_resource(camera::CurrentCameraTag(id))
+		app.insert_resource(camera::CurrentCameraTag(id))
 			.init_resource::<ClearColor>()
 			.add_systems(state::MiniquadPrepareDraw, apply_clear_color)
 			.add_systems(state::MiniquadEndDraw, commit_frame);

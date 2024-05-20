@@ -19,10 +19,7 @@ fn main() {
 				..Default::default()
 			};
 
-			App::new()
-				.add_plugins(QuadifyPlugins.set(window))
-				.add_systems(Startup, set_clear_colour)
-				.run();
+			App::new().add_plugins(QuadifyPlugins.set(window)).add_systems(Startup, set_clear_colour).run();
 		},
 		None,
 	);

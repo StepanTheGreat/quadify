@@ -114,13 +114,13 @@ impl EventHandler for QuadifyState {
 		self.app.world.send_event(bevy_input::mouse::MouseButtonInput {
 			button: mq_to_bevy_mbtn(button),
 			state: ButtonState::Pressed,
-			window: Entity::PLACEHOLDER
+			window: Entity::PLACEHOLDER,
 		});
 	}
 
 	fn mouse_motion_event(&mut self, x: f32, y: f32) {
 		self.app.world.send_event(bevy_input::mouse::MouseMotion {
-			delta: vec2(x, y) // ! x, y here is not delta, but the absolute mouse position. This event is incorrect
+			delta: vec2(x, y), // ! x, y here is not delta, but the absolute mouse position. This event is incorrect
 		});
 	}
 
@@ -128,15 +128,16 @@ impl EventHandler for QuadifyState {
 		self.app.world.send_event(bevy_input::mouse::MouseButtonInput {
 			button: mq_to_bevy_mbtn(button),
 			state: ButtonState::Released,
-			window: Entity::PLACEHOLDER
+			window: Entity::PLACEHOLDER,
 		});
 	}
 
 	fn mouse_wheel_event(&mut self, x: f32, y: f32) {
 		self.app.world.send_event(bevy_input::mouse::MouseWheel {
 			unit: MouseScrollUnit::Pixel,
-			x, y,
-			window: Entity::PLACEHOLDER
+			x,
+			y,
+			window: Entity::PLACEHOLDER,
 		});
 	}
 
@@ -147,7 +148,7 @@ impl EventHandler for QuadifyState {
 			position: Vec2 { x, y },
 			id,
 			force: None,
-			window: Entity::PLACEHOLDER
+			window: Entity::PLACEHOLDER,
 		});
 	}
 
@@ -157,7 +158,7 @@ impl EventHandler for QuadifyState {
 			key_code: KeyCode::Unidentified(NativeKeyCode::Unidentified),
 			state: ButtonState::Pressed, // ! Could be another bug, since the char state would always be `ButtonState::Pressed`
 			logical_key: mq_to_bevy_char(character),
-			window: Entity::PLACEHOLDER
+			window: Entity::PLACEHOLDER,
 		});
 	}
 
@@ -166,7 +167,7 @@ impl EventHandler for QuadifyState {
 			key_code: mq_to_bevy_keycode(keycode),
 			state: ButtonState::Pressed,
 			logical_key: mq_to_bevy_logickey(keycode),
-			window: Entity::PLACEHOLDER
+			window: Entity::PLACEHOLDER,
 		});
 		self.app.world.run_schedule(MiniquadKeyDownEvent);
 	}
@@ -176,7 +177,7 @@ impl EventHandler for QuadifyState {
 			key_code: mq_to_bevy_keycode(keycode),
 			state: ButtonState::Released,
 			logical_key: mq_to_bevy_logickey(keycode),
-			window: Entity::PLACEHOLDER
+			window: Entity::PLACEHOLDER,
 		});
 	}
 }

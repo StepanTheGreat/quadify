@@ -31,9 +31,9 @@ fn keyboard_events(mut events: EventReader<KeyboardInput>, mut window_properties
 						window_properties.width = 600;
 						window_properties.height = 600;
 					}
-				},
+				}
 				KeyCode::KeyR => window_properties.cursor_grabbed = !window_properties.cursor_grabbed,
-				_ => println!("Some other keycode")
+				_ => println!("Some other keycode"),
 			}
 			if let Key::Character(ref char) = event.logical_key {
 				println!("Character key: {:?}", char);
