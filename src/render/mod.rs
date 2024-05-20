@@ -96,11 +96,11 @@ impl RenderingBackend {
                     "you can't use name `Texture` for your texture. This name is reserved for the texture that will be drawn with that material"
                 );
             }
-            if texture == "_ScreenTexture" {
-                panic!(
-                    "you can't use name `_ScreenTexture` for your texture in shaders. This name is reserved for screen texture"
-                );
-            }
+            // if texture == "_ScreenTexture" {
+            //     panic!(
+            //         "you can't use name `_ScreenTexture` for your texture in shaders. This name is reserved for screen texture"
+            //     );
+            // }
             shader_meta.images.push(texture.clone());
         }
 
@@ -115,14 +115,14 @@ impl RenderingBackend {
 			&mut *self.backend,
             shader,
             params,
-            // wants_screen_texture,
             uniforms,
             textures,
         ))
     }
 
-    pub(crate) fn clear(&mut self, color: Rgba) {
-        let clear = PassAction::clear_color(color.r, color.g, color.b, color.a);
+    pub fn clear(&mut self, color: Rgba) {
+        let col = color.to_float();
+        let clear = PassAction::clear_color(col.x, col.y, col.z, col.w);
 
         if let Some(current_pass) = self.state.render_pass {
             self.backend.begin_pass(Some(current_pass), clear);
@@ -180,7 +180,7 @@ impl RenderingBackend {
             .iter_mut()
             .zip(self.draw_call_bindings.iter_mut())
         {
-            let pipeline = self.pipelines.get_quad_pipeline_mut(dc.pipeline);
+            let pipeline = self.pipelines.get_pipeline_mut(dc.pipeline);
 
             let (width, height) = if let Some(render_pass) = dc.render_pass {
                 let render_texture = self.backend.render_pass_texture(render_pass);
@@ -306,14 +306,15 @@ impl RenderingBackend {
         self.state.viewport = viewport;
     }
 
-    // pub fn get_viewport(&self) -> (i32, i32, i32, i32) {
-    //     self.state.viewport.unwrap_or((
-    //         0,
-    //         0,
-    //         crate::window::screen_width() as _,
-    //         crate::window::screen_height() as _,
-    //     ))
-    // }
+    pub fn get_viewport(&self) -> (i32, i32, i32, i32) {
+        let (w, h) = miniquad::window::screen_size();
+        self.state.viewport.unwrap_or((
+            0,
+            0,
+            w as _,
+            h as _,
+        ))
+    }
 
     pub fn push_model_matrix(&mut self, matrix: glam::Mat4) {
         self.state.model_stack.push(self.state.model() * matrix);
@@ -349,7 +350,7 @@ impl RenderingBackend {
 
         let pip = self.state.pipeline.unwrap_or(
             self.pipelines
-                .get(self.state.draw_mode, self.state.depth_test_enable),
+                .get_default_by(self.state.draw_mode, self.state.depth_test_enable),
         );
 
         let previous_dc_ix = if self.draw_calls_count == 0 {
@@ -375,7 +376,7 @@ impl RenderingBackend {
             let uniforms = self.state.pipeline.map_or(None, |pipeline| {
                 Some(
                     self.pipelines
-                        .get_quad_pipeline_mut(pipeline)
+                        .get_pipeline_mut(pipeline)
                         .uniforms_data
                         .clone(),
                 )
@@ -429,12 +430,12 @@ impl RenderingBackend {
         self.state.break_batching = true;
 		
         self.pipelines
-            .get_quad_pipeline_mut(pipeline)
+            .get_pipeline_mut(pipeline)
             .set_uniform(name, uniform);
     }
 
     pub fn set_texture(&mut self, pipeline: GlPipeline, name: &str, texture: TextureId) {
-        let pipeline = self.pipelines.get_quad_pipeline_mut(pipeline);
+        let pipeline = self.pipelines.get_pipeline_mut(pipeline);
         pipeline
             .textures
             .iter()
@@ -451,7 +452,7 @@ impl RenderingBackend {
             .or_insert(texture) = texture;
     }
 
-    pub(crate) fn update_drawcall_capacity(
+    pub fn update_drawcall_capacity(
         &mut self,
         max_vertices: usize,
         max_indices: usize,
@@ -461,7 +462,7 @@ impl RenderingBackend {
 
         for draw_call in &mut self.draw_calls {
             draw_call.vertices =
-                vec![Vertex::new(vec3(0.0, 0.0, 0.0), vec2(0.0, 0.0), rgba::rgba(0.0, 0.0, 0.0, 0.0)); max_vertices];
+                vec![Vertex::new(vec3(0.0, 0.0, 0.0), vec2(0.0, 0.0), rgba::rgba(0, 0, 0, 0)); max_vertices];
             draw_call.indices = vec![0; max_indices];
         }
         for binding in &mut self.draw_call_bindings {
@@ -507,8 +508,8 @@ impl bevy_app::Plugin for RenderBackendPlugin {
 
 fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: Res<ClearColor>, current_camera: Res<camera::CurrentCameraTag>, render_target: Query<&camera::RenderTarget>) {
 	// Begin the render pass
-	let color = clear_color.as_ref().0;
-	let clear = PassAction::clear_color(color.r, color.g, color.b, color.a);
+	let color = clear_color.as_ref().0.to_float();
+	let clear = PassAction::clear_color(color.x, color.y, color.z, color.w);
 	let entity = current_camera.as_ref().0;
 
 	match render_target.get(entity) {

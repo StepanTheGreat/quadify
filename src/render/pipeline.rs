@@ -57,7 +57,7 @@ impl DrawCall {
     ) -> DrawCall {
         DrawCall {
             vertices: vec![
-                Vertex::new(vec3(0., 0., 0.), vec2(0., 0.), rgba(0.0, 0.0, 0.0, 0.0));
+                Vertex::new(vec3(0., 0., 0.), vec2(0., 0.), rgba(0, 0, 0, 0));
                 max_vertices
             ],
             indices: vec![0; max_indices],
@@ -198,7 +198,9 @@ impl PipelineStorage {
 				vertex: shader::VERTEX,
 				fragment: shader::FRAGMENT,
 			},
-			Backend::Metal => ShaderSource::Msl { program: shader::METAL },
+			Backend::Metal => ShaderSource::Msl { 
+                program: shader::METAL 
+            },
 		};
 
 		let shader = ctx.new_shader(source, shader::meta()).unwrap();
@@ -220,7 +222,6 @@ impl PipelineStorage {
 				primitive_type: PrimitiveType::Triangles,
 				..params
 			},
-			// false,
 			vec![],
 			vec![],
 		);
@@ -233,7 +234,6 @@ impl PipelineStorage {
 				primitive_type: PrimitiveType::Lines,
 				..params
 			},
-			// false,
 			vec![],
 			vec![],
 		);
@@ -248,7 +248,6 @@ impl PipelineStorage {
 				primitive_type: PrimitiveType::Triangles,
 				..params
 			},
-			// false,
 			vec![],
 			vec![],
 		);
@@ -263,7 +262,6 @@ impl PipelineStorage {
 				primitive_type: PrimitiveType::Lines,
 				..params
 			},
-			// false,
 			vec![],
 			vec![],
 		);
@@ -277,17 +275,13 @@ impl PipelineStorage {
 		ctx: &mut dyn RenderingBackend,
 		shader: ShaderId,
 		params: PipelineParams,
-		// wants_screen_texture: bool,
 		mut uniforms: Vec<(String, UniformType)>,
 		textures: Vec<String>,
 	) -> GlPipeline {
+        // TODO: Is it possible to create custom pipelines, with custom vertex attributes? Or is it batch-bound?
 		let pipeline = ctx.new_pipeline(
 			&[BufferLayout::default()],
-			&[
-				VertexAttribute::new("position", VertexFormat::Float3),
-				VertexAttribute::new("texcoord", VertexFormat::Float2),
-				VertexAttribute::new("color0", VertexFormat::Byte4),
-			],
+			&Vertex::attributes(),
 			shader,
 			params,
 		);
@@ -317,7 +311,6 @@ impl PipelineStorage {
 
 		self.pipelines[id] = Some(PipelineExt {
 			pipeline,
-			// wants_screen_texture,
 			uniforms,
 			uniforms_data: vec![0; max_offset],
 			textures,
@@ -327,7 +320,7 @@ impl PipelineStorage {
 		GlPipeline(id)
 	}
 
-	pub fn get(&self, draw_mode: DrawMode, depth_enabled: bool) -> GlPipeline {
+	pub fn get_default_by(&self, draw_mode: DrawMode, depth_enabled: bool) -> GlPipeline {
         match (draw_mode, depth_enabled) {
             (DrawMode::Triangles, false) => Self::TRIANGLES_PIPELINE,
             (DrawMode::Triangles, true) => Self::TRIANGLES_DEPTH_PIPELINE,
@@ -336,7 +329,7 @@ impl PipelineStorage {
         }
     }
 
-    pub fn get_quad_pipeline_mut(&mut self, pip: GlPipeline) -> &mut PipelineExt {
+    pub fn get_pipeline_mut(&mut self, pip: GlPipeline) -> &mut PipelineExt {
         self.pipelines[pip.0].as_mut().unwrap()
     }
 
