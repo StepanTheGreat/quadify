@@ -1,15 +1,15 @@
-use bevy::prelude::*;
 use bevy::input::mouse::{MouseButtonInput, MouseMotion, MouseWheel};
+use bevy::prelude::*;
 use bevy_app::AppExit;
-use quadify::prelude::*;
 use quadify::prelude::WindowPlugin;
+use quadify::prelude::*;
 
 const INPUT_NEEDED: u32 = 4;
 
 #[derive(Resource)]
 struct InputReceived(u32);
 
-//TODO: Add mouse position, mouse wheel resource check, 
+//TODO: Add mouse position, mouse wheel resource check,
 
 #[test]
 fn main() {
@@ -24,31 +24,18 @@ fn main() {
 			..Default::default()
 		}))
 		.insert_resource(InputReceived(0))
-		.add_systems(Update, (
-			mouse_btn_events, 
-			mouse_motion_events,
-			mouse_scroll_events,
-			mouse_button,
-			close_when_received_all
-		))
+		.add_systems(Update, (mouse_btn_events, mouse_motion_events, mouse_scroll_events, mouse_button, close_when_received_all))
 		.run();
 }
 
-fn close_when_received_all(
-	received: Res<InputReceived>,
-	mut quit_events: EventWriter<AppExit>
-) {
+fn close_when_received_all(received: Res<InputReceived>, mut quit_events: EventWriter<AppExit>) {
 	if received.0 == INPUT_NEEDED {
 		quit_events.send(AppExit);
 		println!("Received all events!");
 	}
 }
 
-fn mouse_btn_events(
-	mbtn_events: EventReader<MouseButtonInput>, 
-	mut received: ResMut<InputReceived>,
-	mut is_done: Local<bool>
-) {
+fn mouse_btn_events(mbtn_events: EventReader<MouseButtonInput>, mut received: ResMut<InputReceived>, mut is_done: Local<bool>) {
 	if !*is_done {
 		if !mbtn_events.is_empty() {
 			*is_done = true;
@@ -58,11 +45,7 @@ fn mouse_btn_events(
 	}
 }
 
-fn mouse_motion_events(
-	mmotion_events: EventReader<MouseMotion>, 
-	mut received: ResMut<InputReceived>,
-	mut is_done: Local<bool>
-) {
+fn mouse_motion_events(mmotion_events: EventReader<MouseMotion>, mut received: ResMut<InputReceived>, mut is_done: Local<bool>) {
 	if !*is_done {
 		if !mmotion_events.is_empty() {
 			*is_done = true;
@@ -72,11 +55,7 @@ fn mouse_motion_events(
 	}
 }
 
-fn mouse_scroll_events(
-	mscroll_events: EventReader<MouseWheel>, 
-	mut received: ResMut<InputReceived>,
-	mut is_done: Local<bool>
-) {
+fn mouse_scroll_events(mscroll_events: EventReader<MouseWheel>, mut received: ResMut<InputReceived>, mut is_done: Local<bool>) {
 	if !*is_done {
 		if !mscroll_events.is_empty() {
 			*is_done = true;
@@ -86,11 +65,7 @@ fn mouse_scroll_events(
 	}
 }
 
-fn mouse_button(
-	mbtn: Res<ButtonInput<MouseButton>>, 
-	mut received: ResMut<InputReceived>,
-	mut is_done: Local<bool>
-) {
+fn mouse_button(mbtn: Res<ButtonInput<MouseButton>>, mut received: ResMut<InputReceived>, mut is_done: Local<bool>) {
 	if !*is_done {
 		if mbtn.pressed(MouseButton::Left) {
 			*is_done = true;

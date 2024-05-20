@@ -2,11 +2,11 @@ use bevy_app::{App, Last, Plugin};
 use bevy_ecs::schedule::ExecutorKind;
 use miniquad::conf::{Conf, PlatformSettings};
 
+mod conversions;
 pub(crate) mod events;
 pub(crate) mod icon;
 pub(crate) mod state;
 pub(crate) mod tick;
-mod conversions;
 
 /// Initializes main window and starts the `miniquad` event loop.
 pub struct WindowPlugin {

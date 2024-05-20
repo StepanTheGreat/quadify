@@ -16,12 +16,7 @@ impl Rgba {
 	}
 
 	pub fn to_float(&self) -> Vec4 {
-		vec4(
-			(self.r as f32)/255.0, 
-            (self.g as f32)/255.0, 
-            (self.b as f32)/255.0, 
-            (self.a as f32)/255.0
-		)
+		vec4((self.r as f32) / 255.0, (self.g as f32) / 255.0, (self.b as f32) / 255.0, (self.a as f32) / 255.0)
 	}
 }
 

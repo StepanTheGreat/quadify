@@ -1,7 +1,10 @@
+use super::{
+	geometry::Vertex,
+	rgba::{rgba, Rgba},
+};
+use glam::{vec2, vec3};
 use miniquad::*;
-use glam::{vec3, vec2};
 use std::collections::BTreeMap;
-use super::{geometry::Vertex, rgba::{rgba, Rgba}};
 
 const fn as_bytes<T, const SIZE: usize>() -> [u8; SIZE] {
 	debug_assert!(std::mem::size_of::<T>() == SIZE);
@@ -13,8 +16,8 @@ pub struct GlPipeline(usize);
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum DrawMode {
-    Triangles,
-    Lines,
+	Triangles,
+	Lines,
 }
 
 #[derive(Clone, Debug)]
@@ -25,101 +28,98 @@ pub struct Uniform {
 }
 
 pub struct DrawCall {
-    pub vertices: Vec<Vertex>,
-    pub indices: Vec<u16>,
+	pub vertices: Vec<Vertex>,
+	pub indices: Vec<u16>,
 
-    pub vertices_count: usize,
-    pub indices_count: usize,
+	pub vertices_count: usize,
+	pub indices_count: usize,
 
-    pub clip: Option<(i32, i32, i32, i32)>,
-    pub viewport: Option<(i32, i32, i32, i32)>,
-    pub texture: Option<miniquad::TextureId>,
+	pub clip: Option<(i32, i32, i32, i32)>,
+	pub viewport: Option<(i32, i32, i32, i32)>,
+	pub texture: Option<miniquad::TextureId>,
 
-    pub model: glam::Mat4,
+	pub model: glam::Mat4,
 
-    pub draw_mode: DrawMode,
-    pub pipeline: GlPipeline,
-    pub uniforms: Option<Vec<u8>>,
-    pub render_pass: Option<RenderPass>,
-    pub capture: bool,
+	pub draw_mode: DrawMode,
+	pub pipeline: GlPipeline,
+	pub uniforms: Option<Vec<u8>>,
+	pub render_pass: Option<RenderPass>,
+	pub capture: bool,
 }
 
 impl DrawCall {
-    pub fn new(
-        texture: Option<miniquad::TextureId>,
-        model: glam::Mat4,
-        draw_mode: DrawMode,
-        pipeline: GlPipeline,
-        uniforms: Option<Vec<u8>>,
-        render_pass: Option<RenderPass>,
-        max_vertices: usize,
-        max_indices: usize,
-    ) -> DrawCall {
-        DrawCall {
-            vertices: vec![
-                Vertex::new(vec3(0., 0., 0.), vec2(0., 0.), rgba(0, 0, 0, 0));
-                max_vertices
-            ],
-            indices: vec![0; max_indices],
-            vertices_count: 0,
-            indices_count: 0,
-            viewport: None,
-            clip: None,
-            texture,
-            model,
-            draw_mode,
-            pipeline,
-            uniforms,
-            render_pass,
-            capture: false,
-        }
-    }
+	pub fn new(
+		texture: Option<miniquad::TextureId>,
+		model: glam::Mat4,
+		draw_mode: DrawMode,
+		pipeline: GlPipeline,
+		uniforms: Option<Vec<u8>>,
+		render_pass: Option<RenderPass>,
+		max_vertices: usize,
+		max_indices: usize,
+	) -> DrawCall {
+		DrawCall {
+			vertices: vec![Vertex::new(vec3(0., 0., 0.), vec2(0., 0.), rgba(0, 0, 0, 0)); max_vertices],
+			indices: vec![0; max_indices],
+			vertices_count: 0,
+			indices_count: 0,
+			viewport: None,
+			clip: None,
+			texture,
+			model,
+			draw_mode,
+			pipeline,
+			uniforms,
+			render_pass,
+			capture: false,
+		}
+	}
 
-    pub fn vertices(&self) -> &[Vertex] {
-        &self.vertices[0..self.vertices_count]
-    }
+	pub fn vertices(&self) -> &[Vertex] {
+		&self.vertices[0..self.vertices_count]
+	}
 
-    pub fn indices(&self) -> &[u16] {
-        &self.indices[0..self.indices_count]
-    }
+	pub fn indices(&self) -> &[u16] {
+		&self.indices[0..self.indices_count]
+	}
 }
 
 pub struct GlState {
-    pub texture: Option<miniquad::TextureId>,
-    pub draw_mode: DrawMode,
-    pub clip: Option<(i32, i32, i32, i32)>,
-    pub viewport: Option<(i32, i32, i32, i32)>,
-    pub model_stack: Vec<glam::Mat4>,
-    pub pipeline: Option<GlPipeline>,
-    pub depth_test_enable: bool,
+	pub texture: Option<miniquad::TextureId>,
+	pub draw_mode: DrawMode,
+	pub clip: Option<(i32, i32, i32, i32)>,
+	pub viewport: Option<(i32, i32, i32, i32)>,
+	pub model_stack: Vec<glam::Mat4>,
+	pub pipeline: Option<GlPipeline>,
+	pub depth_test_enable: bool,
 
-    pub break_batching: bool,
+	pub break_batching: bool,
 
-    pub render_pass: Option<RenderPass>,
-    pub capture: bool,
+	pub render_pass: Option<RenderPass>,
+	pub capture: bool,
 }
 
 impl Default for GlState {
-    fn default() -> Self {
-        Self {
-            clip: None,
-            viewport: None,
-            texture: None,
-            model_stack: vec![glam::Mat4::IDENTITY],
-            draw_mode: DrawMode::Triangles,
-            pipeline: None,
-            break_batching: false,
-            depth_test_enable: false,
-            render_pass: None,
-            capture: false,
-        }
-    }
+	fn default() -> Self {
+		Self {
+			clip: None,
+			viewport: None,
+			texture: None,
+			model_stack: vec![glam::Mat4::IDENTITY],
+			draw_mode: DrawMode::Triangles,
+			pipeline: None,
+			break_batching: false,
+			depth_test_enable: false,
+			render_pass: None,
+			capture: false,
+		}
+	}
 }
 
 impl GlState {
-    pub fn model(&self) -> glam::Mat4 {
-        *self.model_stack.last().unwrap()
-    }
+	pub fn model(&self) -> glam::Mat4 {
+		*self.model_stack.last().unwrap()
+	}
 }
 
 #[derive(Clone)]
@@ -132,53 +132,43 @@ pub struct PipelineExt {
 }
 
 impl PipelineExt {
-    pub fn set_uniform<T>(&mut self, name: &str, uniform: T) {
-        let uniform_meta = self.uniforms.iter().find(
-            |Uniform {
-                 name: uniform_name, ..
-             }| uniform_name == name,
-        );
-        if uniform_meta.is_none() {
-            #[cfg(feature = "log")]
-            bevy_log::warn!("Trying to set non-existing uniform: {}", name);
-            return;
-        }
-        let uniform_meta = uniform_meta.unwrap();
-        let uniform_format = uniform_meta.uniform_type;
-        let uniform_byte_size = uniform_format.size();
-        let uniform_byte_offset = uniform_meta.byte_offset;
+	pub fn set_uniform<T>(&mut self, name: &str, uniform: T) {
+		let uniform_meta = self.uniforms.iter().find(|Uniform { name: uniform_name, .. }| uniform_name == name);
+		if uniform_meta.is_none() {
+			#[cfg(feature = "log")]
+			bevy_log::warn!("Trying to set non-existing uniform: {}", name);
+			return;
+		}
+		let uniform_meta = uniform_meta.unwrap();
+		let uniform_format = uniform_meta.uniform_type;
+		let uniform_byte_size = uniform_format.size();
+		let uniform_byte_offset = uniform_meta.byte_offset;
 
-        if std::mem::size_of::<T>() != uniform_byte_size {
-            #[cfg(feature = "log")]
-            bevy_log::warn!(
-                "Trying to set uniform {} sized {} bytes value of {} bytes",
-                name,
-                uniform_byte_size,
-                std::mem::size_of::<T>()
-            );
-            return;
-        }
+		if std::mem::size_of::<T>() != uniform_byte_size {
+			#[cfg(feature = "log")]
+			bevy_log::warn!("Trying to set uniform {} sized {} bytes value of {} bytes", name, uniform_byte_size, std::mem::size_of::<T>());
+			return;
+		}
 
-        // ? This part could be questionable
-        macro_rules! transmute_uniform {
-            ($uniform_size:expr, $byte_offset:expr, $n:expr) => {
-                if $uniform_size == $n {
-                    let data: [u8; $n] = unsafe { std::mem::transmute_copy(&uniform) };
+		// ? This part could be questionable
+		macro_rules! transmute_uniform {
+			($uniform_size:expr, $byte_offset:expr, $n:expr) => {
+				if $uniform_size == $n {
+					let data: [u8; $n] = unsafe { std::mem::transmute_copy(&uniform) };
 
-                    for i in 0..$uniform_size {
-                        self.uniforms_data[$byte_offset + i] = data[i];
-                    }
-                }
-            };
-        }
-        transmute_uniform!(uniform_byte_size, uniform_byte_offset, 4);
-        transmute_uniform!(uniform_byte_size, uniform_byte_offset, 8);
-        transmute_uniform!(uniform_byte_size, uniform_byte_offset, 12);
-        transmute_uniform!(uniform_byte_size, uniform_byte_offset, 16);
-        transmute_uniform!(uniform_byte_size, uniform_byte_offset, 64);
-    }
+					for i in 0..$uniform_size {
+						self.uniforms_data[$byte_offset + i] = data[i];
+					}
+				}
+			};
+		}
+		transmute_uniform!(uniform_byte_size, uniform_byte_offset, 4);
+		transmute_uniform!(uniform_byte_size, uniform_byte_offset, 8);
+		transmute_uniform!(uniform_byte_size, uniform_byte_offset, 12);
+		transmute_uniform!(uniform_byte_size, uniform_byte_offset, 16);
+		transmute_uniform!(uniform_byte_size, uniform_byte_offset, 64);
+	}
 }
-
 
 #[repr(transparent)]
 pub struct PipelineStorage {
@@ -198,9 +188,7 @@ impl PipelineStorage {
 				vertex: shader::VERTEX,
 				fragment: shader::FRAGMENT,
 			},
-			Backend::Metal => ShaderSource::Msl { 
-                program: shader::METAL 
-            },
+			Backend::Metal => ShaderSource::Msl { program: shader::METAL },
 		};
 
 		let shader = ctx.new_shader(source, shader::meta()).unwrap();
@@ -270,21 +258,9 @@ impl PipelineStorage {
 		storage
 	}
 
-	pub fn make_pipeline(
-		&mut self,
-		ctx: &mut dyn RenderingBackend,
-		shader: ShaderId,
-		params: PipelineParams,
-		mut uniforms: Vec<(String, UniformType)>,
-		textures: Vec<String>,
-	) -> GlPipeline {
-        // TODO: Is it possible to create custom pipelines, with custom vertex attributes? Or is it batch-bound?
-		let pipeline = ctx.new_pipeline(
-			&[BufferLayout::default()],
-			&Vertex::attributes(),
-			shader,
-			params,
-		);
+	pub fn make_pipeline(&mut self, ctx: &mut dyn RenderingBackend, shader: ShaderId, params: PipelineParams, mut uniforms: Vec<(String, UniformType)>, textures: Vec<String>) -> GlPipeline {
+		// TODO: Is it possible to create custom pipelines, with custom vertex attributes? Or is it batch-bound?
+		let pipeline = ctx.new_pipeline(&[BufferLayout::default()], &Vertex::attributes(), shader, params);
 
 		let id = self.pipelines.iter().position(|p| p.is_none()).expect("Pipelines amount exceeded");
 		let mut max_offset = 0;
@@ -321,21 +297,21 @@ impl PipelineStorage {
 	}
 
 	pub fn get_default_by(&self, draw_mode: DrawMode, depth_enabled: bool) -> GlPipeline {
-        match (draw_mode, depth_enabled) {
-            (DrawMode::Triangles, false) => Self::TRIANGLES_PIPELINE,
-            (DrawMode::Triangles, true) => Self::TRIANGLES_DEPTH_PIPELINE,
-            (DrawMode::Lines, false) => Self::LINES_PIPELINE,
-            (DrawMode::Lines, true) => Self::LINES_DEPTH_PIPELINE,
-        }
-    }
+		match (draw_mode, depth_enabled) {
+			(DrawMode::Triangles, false) => Self::TRIANGLES_PIPELINE,
+			(DrawMode::Triangles, true) => Self::TRIANGLES_DEPTH_PIPELINE,
+			(DrawMode::Lines, false) => Self::LINES_PIPELINE,
+			(DrawMode::Lines, true) => Self::LINES_DEPTH_PIPELINE,
+		}
+	}
 
-    pub fn get_pipeline_mut(&mut self, pip: GlPipeline) -> &mut PipelineExt {
-        self.pipelines[pip.0].as_mut().unwrap()
-    }
+	pub fn get_pipeline_mut(&mut self, pip: GlPipeline) -> &mut PipelineExt {
+		self.pipelines[pip.0].as_mut().unwrap()
+	}
 
-    pub fn delete_pipeline(&mut self, pip: GlPipeline) {
-        self.pipelines[pip.0] = None;
-    }
+	pub fn delete_pipeline(&mut self, pip: GlPipeline) {
+		self.pipelines[pip.0] = None;
+	}
 }
 
 pub(crate) mod shader {

@@ -1,7 +1,7 @@
 use bevy_app::*;
 use bevy_ecs::system::ResMut;
-use quadify::prelude::*;
 use quadify::prelude::rgba;
+use quadify::prelude::*;
 
 #[test]
 fn main() {
