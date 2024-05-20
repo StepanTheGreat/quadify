@@ -1,46 +1,57 @@
+use glam::{vec4, Vec4};
+
 /// RGBA color struct
 #[repr(C)]
 #[derive(Debug, Clone, Copy, PartialEq, Default)]
 pub struct Rgba {
-	pub r: f32,
-	pub g: f32,
-	pub b: f32,
-	pub a: f32,
+	pub r: u8,
+	pub g: u8,
+	pub b: u8,
+	pub a: u8,
 }
 
 impl Rgba {
-	pub const fn new(r: f32, g: f32, b: f32, a: f32) -> Self {
+	pub const fn new(r: u8, g: u8, b: u8, a: u8) -> Self {
 		Self { r, g, b, a }
+	}
+
+	pub fn to_float(&self) -> Vec4 {
+		vec4(
+			(self.r as f32)/255.0, 
+            (self.g as f32)/255.0, 
+            (self.b as f32)/255.0, 
+            (self.a as f32)/255.0
+		)
 	}
 }
 
-pub const fn rgba(r: f32, g: f32, b: f32, a: f32) -> Rgba {
+pub const fn rgba(r: u8, g: u8, b: u8, a: u8) -> Rgba {
 	Rgba { r, g, b, a }
 }
 
 // Taken from macroquad
-pub const LIGHTGRAY: Rgba = rgba(0.78, 0.78, 0.78, 1.00);
-pub const GRAY: Rgba = rgba(0.51, 0.51, 0.51, 1.00);
-pub const DARKGRAY: Rgba = rgba(0.31, 0.31, 0.31, 1.00);
-pub const YELLOW: Rgba = rgba(0.99, 0.98, 0.00, 1.00);
-pub const GOLD: Rgba = rgba(1.00, 0.80, 0.00, 1.00);
-pub const ORANGE: Rgba = rgba(1.00, 0.63, 0.00, 1.00);
-pub const PINK: Rgba = rgba(1.00, 0.43, 0.76, 1.00);
-pub const RED: Rgba = rgba(0.90, 0.16, 0.22, 1.00);
-pub const MAROON: Rgba = rgba(0.75, 0.13, 0.22, 1.00);
-pub const GREEN: Rgba = rgba(0.00, 0.89, 0.19, 1.00);
-pub const LIME: Rgba = rgba(0.00, 0.62, 0.18, 1.00);
-pub const DARKGREEN: Rgba = rgba(0.00, 0.46, 0.17, 1.00);
-pub const SKYBLUE: Rgba = rgba(0.40, 0.75, 1.00, 1.00);
-pub const BLUE: Rgba = rgba(0.00, 0.47, 0.95, 1.00);
-pub const DARKBLUE: Rgba = rgba(0.00, 0.32, 0.67, 1.00);
-pub const PURPLE: Rgba = rgba(0.78, 0.48, 1.00, 1.00);
-pub const VIOLET: Rgba = rgba(0.53, 0.24, 0.75, 1.00);
-pub const DARKPURPLE: Rgba = rgba(0.44, 0.12, 0.49, 1.00);
-pub const BEIGE: Rgba = rgba(0.83, 0.69, 0.51, 1.00);
-pub const BROWN: Rgba = rgba(0.50, 0.42, 0.31, 1.00);
-pub const DARKBROWN: Rgba = rgba(0.30, 0.25, 0.18, 1.00);
-pub const WHITE: Rgba = rgba(1.00, 1.00, 1.00, 1.00);
-pub const BLACK: Rgba = rgba(0.00, 0.00, 0.00, 1.00);
-pub const BLANK: Rgba = Rgba::new(0.00, 0.00, 0.00, 0.00);
-pub const MAGENTA: Rgba = Rgba::new(1.00, 0.00, 1.00, 1.00);
+pub const LIGHTGRAY: Rgba = rgba(199, 199, 199, 255);
+pub const GRAY: Rgba = rgba(130, 130, 130, 255);
+pub const DARKGRAY: Rgba = rgba(79, 79, 79, 255);
+pub const YELLOW: Rgba = rgba(252, 250, 0, 255);
+pub const GOLD: Rgba = rgba(255, 204, 0, 255);
+pub const ORANGE: Rgba = rgba(255, 161, 0, 255);
+pub const PINK: Rgba = rgba(255, 110, 194, 255);
+pub const RED: Rgba = rgba(230, 41, 56, 255);
+pub const MAROON: Rgba = rgba(192, 33, 56, 255);
+pub const GREEN: Rgba = rgba(0, 227, 48, 255);
+pub const LIME: Rgba = rgba(0, 158, 112, 255);
+pub const DARKGREEN: Rgba = rgba(0, 117, 43, 255);
+pub const SKYBLUE: Rgba = rgba(102, 192, 255, 255);
+pub const BLUE: Rgba = rgba(0, 120, 242, 255);
+pub const DARKBLUE: Rgba = rgba(0, 82, 171, 255);
+pub const PURPLE: Rgba = rgba(199, 122, 255, 255);
+pub const VIOLET: Rgba = rgba(135, 61, 192, 255);
+pub const DARKPURPLE: Rgba = rgba(112, 31, 125, 255);
+pub const BEIGE: Rgba = rgba(212, 176, 130, 255);
+pub const BROWN: Rgba = rgba(128, 107, 79, 255);
+pub const DARKBROWN: Rgba = rgba(77, 64, 112, 255);
+pub const WHITE: Rgba = rgba(255, 255, 255, 255);
+pub const BLACK: Rgba = rgba(0, 0, 0, 255);
+pub const BLANK: Rgba = rgba(0, 0, 0, 0);
+pub const MAGENTA: Rgba = rgba(255, 0, 255, 255);
