@@ -1,10 +1,10 @@
 /// This test should be changed in the future to use more higher-level functionality like `Material`s, to avoid writing repetitive shaders;
 /// Thus this test is only for mesh demonstration purposes.
-
 use bevy_app::*;
 use bevy_ecs::prelude::*;
 
 use miniquad::*;
+use quadify::prelude::RenderingBackend;
 use quadify::{color, prelude::*};
 
 struct RenderState {
@@ -73,12 +73,6 @@ fn draw_circle(render_state: NonSend<RenderState>, mut render_ctx: NonSendMut<Re
 	render_ctx.apply_bindings(&bindings);
 	render_ctx.draw(0, verts, 1);
 	render_ctx.end_render_pass();
-
-	// backend.begin_default_pass(PassAction::Clear {
-	//     color: Some((0.0, 0.0, 0.0, 1.0)),
-	//     depth: None,
-	//     stencil: None
-	// });
 }
 
 const VERTEX_SHADER: &str = r#"#version 100

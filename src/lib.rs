@@ -1,7 +1,7 @@
 /// Simplified import for all the crate's types and functions
 pub mod prelude {
 	pub use crate::io::*;
-	pub use crate::render::{camera::*, *};
+	pub use crate::render::{camera::*, geometry::*, *};
 	pub use crate::window::{events::*, icon::*, state::*, *};
 	pub use crate::QuadifyPlugins;
 
@@ -32,7 +32,7 @@ impl PluginGroup for QuadifyPlugins {
 			.add(render::RenderBackendPlugin)
 			.add(window::WindowPlugin::default());
 
-			#[cfg(feature = "log")]
+		#[cfg(feature = "log")]
 		{
 			builder = builder.add(bevy_log::LogPlugin::default());
 		}
