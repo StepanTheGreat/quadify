@@ -33,11 +33,11 @@ pub struct MiniquadDraw;
 
 /// Almost the same as [`MiniquadDraw`], but is for general preparation like screen and depth clearing, runs before [`MiniquadDraw`]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct MiniquadPrepareDraw;
+pub(crate) struct MiniquadPrepareDraw;
 
 /// Almost the same as [`MiniquadDraw`], but is only used to commit the framebuffer to the screen. Don't use it
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct MiniquadEndDraw;
+pub(crate) struct MiniquadEndDraw;
 
 /// Special Schedule called directly inside the Mouse Event handler.
 /// Allows users to run higher privilege code on the Web, as the Systems are run in the event listener's context.
