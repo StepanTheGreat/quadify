@@ -30,6 +30,7 @@ pub enum WindowEvent {
 #[derive(Debug, Clone, Resource)]
 pub struct WindowProperties {
 	pub fullscreen: bool,
+	/// x and y position of the window
 	pub position: Option<(u32, u32)>,
 	pub width: u32,
 	pub height: u32,
