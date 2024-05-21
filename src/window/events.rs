@@ -10,7 +10,7 @@ use bevy_ecs::{
 use bevy_input::keyboard::{KeyCode, KeyboardInput};
 use miniquad::CursorIcon;
 
-#[derive(Debug, Clone, Copy, Event)]
+#[derive(Debug, Clone, Event)]
 pub enum WindowEvent {
 	/// The window was minimized, `blur` event on Web
 	Minimized,
@@ -27,7 +27,7 @@ pub enum WindowEvent {
 	CloseRequested,
 }
 
-#[derive(Debug, Clone, Copy, Resource)]
+#[derive(Debug, Clone, Resource)]
 pub struct WindowProperties {
 	pub fullscreen: bool,
 	pub width: u32,
@@ -74,7 +74,7 @@ pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<Windo
 		}
 	}
 
-	*previous = Some(*properties);
+	*previous = Some(properties.clone());
 	*first_run = true; // first run is inverted XD
 }
 
