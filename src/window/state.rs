@@ -7,7 +7,7 @@ use bevy_input::{prelude::*, ButtonState};
 use glam::{vec2, Vec2};
 use miniquad::{window, EventHandler};
 
-use super::conversions::{mq_to_bevy_char, mq_to_bevy_keycode, mq_to_bevy_logickey, mq_to_bevy_mbtn, mq_to_bevy_tch};
+use super::conversions::{mq_to_bevy_char, mq_to_bevy_keycode, mq_to_bevy_logical_key, mq_to_bevy_mbtn, mq_to_bevy_tch};
 use super::events;
 use crate::render::RenderingBackend;
 
@@ -163,7 +163,7 @@ impl EventHandler for QuadifyState {
 		self.app.world.send_event(bevy_input::keyboard::KeyboardInput {
 			key_code: mq_to_bevy_keycode(keycode),
 			state: ButtonState::Pressed,
-			logical_key: mq_to_bevy_logickey(keycode),
+			logical_key: mq_to_bevy_logical_key(keycode),
 			window: Entity::PLACEHOLDER,
 		});
 		self.app.world.run_schedule(MiniquadKeyDownEvent);
@@ -173,7 +173,7 @@ impl EventHandler for QuadifyState {
 		self.app.world.send_event(bevy_input::keyboard::KeyboardInput {
 			key_code: mq_to_bevy_keycode(keycode),
 			state: ButtonState::Released,
-			logical_key: mq_to_bevy_logickey(keycode),
+			logical_key: mq_to_bevy_logical_key(keycode),
 			window: Entity::PLACEHOLDER,
 		});
 	}
