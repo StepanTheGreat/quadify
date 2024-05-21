@@ -30,6 +30,7 @@ pub enum WindowEvent {
 #[derive(Debug, Clone, Resource)]
 pub struct WindowProperties {
 	pub fullscreen: bool,
+	pub position: Option<(u32, u32)>,
 	pub width: u32,
 	pub height: u32,
 	pub cursor_grabbed: bool,
@@ -71,11 +72,16 @@ pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<Windo
 			if previous.cursor != properties.cursor {
 				miniquad::window::set_mouse_cursor(properties.cursor);
 			}
+			if previous.position != properties.position {
+				if let Some((x, y)) = properties.position {
+					miniquad::window::set_window_position(x, y);
+				}
+			}
 		}
 	}
 
 	*previous = Some(properties.clone());
-	*first_run = true; // first run is inverted XD
+	*first_run = true; // first run is inverted
 }
 
 /// Exits the application when the escape key is pressed

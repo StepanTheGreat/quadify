@@ -66,6 +66,7 @@ impl Plugin for WindowPlugin {
 			height: self.height as u32,
 			cursor_grabbed: false,
 			cursor: miniquad::CursorIcon::Default,
+			position: None,
 			window: window_entity,
 		};
 
