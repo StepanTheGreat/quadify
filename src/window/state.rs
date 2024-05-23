@@ -97,13 +97,12 @@ impl EventHandler for QuadifyState {
 
 	// File Drag and Drop
 	fn files_dropped_event(&mut self) {
-		let events = (0..window::dropped_file_count()).map(|i| {
+		self.app.world.send_event_batch((0..window::dropped_file_count()).map(|i| {
 			let path = window::dropped_file_path(i);
 			let bytes = window::dropped_file_bytes(i);
-			dbg!(events::DroppedFileEvent { path, bytes })
-		});
 
-		self.app.world.send_event_batch(events);
+			events::DroppedFileEvent { path, bytes }
+		}));
 	}
 
 	// Mouse Events

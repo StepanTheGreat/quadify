@@ -13,12 +13,20 @@ fn main() {
 			resizeable: true,
 			..Default::default()
 		}))
-		.add_systems(Update, (read_keyboard, quit_on_esc))
+		.add_systems(Update, (read_keyboard, quit_on_esc, file_drop_events))
 		.run();
 }
 
 fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>) {
-	for event in keyboard_events.read() {
-		println!("Received Event: {:?}", event);
+	for _event in keyboard_events.read() {
+		#[cfg(feature = "log")]
+		bevy_log::info!("Received Event: {:?}", _event);
+	}
+}
+
+fn file_drop_events(mut events: EventReader<DroppedFileEvent>) {
+	for _event in events.read() {
+		#[cfg(feature = "log")]
+		bevy_log::info!("File Dropped into Application: {:?}", _event);
 	}
 }
