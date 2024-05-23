@@ -7,8 +7,6 @@ fn main() {
 			width: 512,
 			height: 512,
 			title: "Hi".to_owned(),
-			high_dpi: false,
-			resizeable: false,
 			..Default::default()
 		}))
 		.add_systems(Startup, say_hi)

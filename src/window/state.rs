@@ -1,4 +1,5 @@
 use bevy_app::*;
+use bevy_ecs::change_detection::DetectChangesMut;
 use bevy_ecs::entity::Entity;
 use bevy_ecs::{schedule::ScheduleLabel, system::Resource};
 use bevy_input::keyboard::NativeKeyCode;
@@ -110,6 +111,11 @@ impl EventHandler for QuadifyState {
 
 	// Mouse Events
 	fn mouse_button_down_event(&mut self, button: miniquad::MouseButton, _x: f32, _y: f32) {
+		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
+			props.bypass_change_detection();
+			props.cursor_position = (_x, _y);
+		}
+
 		self.app.world.send_event(bevy_input::mouse::MouseButtonInput {
 			button: mq_to_bevy_mbtn(button),
 			state: ButtonState::Pressed,
@@ -118,12 +124,23 @@ impl EventHandler for QuadifyState {
 	}
 
 	fn mouse_motion_event(&mut self, x: f32, y: f32) {
+		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
+			props.bypass_change_detection();
+			props.cursor_position.0 += x;
+			props.cursor_position.1 += y;
+		}
+
 		self.app.world.send_event(bevy_input::mouse::MouseMotion {
 			delta: vec2(x, y), // ! x, y here is not delta, but the absolute mouse position. This event is incorrect
 		});
 	}
 
 	fn mouse_button_up_event(&mut self, button: miniquad::MouseButton, _x: f32, _y: f32) {
+		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
+			props.bypass_change_detection();
+			props.cursor_position = (_x, _y);
+		}
+
 		self.app.world.send_event(bevy_input::mouse::MouseButtonInput {
 			button: mq_to_bevy_mbtn(button),
 			state: ButtonState::Released,
@@ -132,6 +149,11 @@ impl EventHandler for QuadifyState {
 	}
 
 	fn mouse_wheel_event(&mut self, x: f32, y: f32) {
+		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
+			props.bypass_change_detection();
+			props.cursor_position = (x, y);
+		}
+
 		self.app.world.send_event(bevy_input::mouse::MouseWheel {
 			unit: MouseScrollUnit::Pixel,
 			x,

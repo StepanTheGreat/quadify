@@ -29,20 +29,28 @@ pub enum WindowEvent {
 
 #[derive(Debug, Clone, Resource)]
 pub struct WindowProperties {
-	pub fullscreen: bool,
+	pub(crate) window: Entity,
+
 	/// x and y position of the window
 	pub position: Option<(u32, u32)>,
 	pub width: u32,
 	pub height: u32,
+	pub fullscreen: bool,
+
+	pub(crate) cursor_position: (f32, f32),
 	pub cursor_grabbed: bool,
 	pub cursor: CursorIcon,
-	pub(crate) window: Entity,
 }
 
 impl WindowProperties {
 	/// An empty entity that's used to identify the main window. Since `miniquad` doesn't support multiwindow.
 	pub fn window(&self) -> Entity {
 		self.window
+	}
+
+	/// Get the position of the Mouse Cursor. Only updated on Mouse Input events.
+	pub fn cursor_position(&self) -> (f32, f32) {
+		self.cursor_position
 	}
 }
 
