@@ -2,8 +2,8 @@
 /// Thus this test is only for mesh demonstration purposes.
 use bevy::prelude::*;
 use bevy_input::mouse::MouseButtonInput;
-use quadify::color::rgba;
-use quadify::prelude::geometry::{Mesh, Vertex};
+use quadify::color::{rgba, WHITE};
+use quadify::prelude::geometry::{Mesh, MeshBuilder, Vertex};
 use quadify::prelude::RenderingBackend;
 use quadify::prelude::WindowPlugin;
 use quadify::{color, prelude::*};
@@ -25,6 +25,7 @@ fn main() {
 			resizeable: false,
 			..Default::default()
 		}))
+
 		.add_systems(Startup, setup_render_state)
 		.add_systems(Update, change_on_click)
 		.add_systems(MiniquadDraw, draw_circle)
@@ -32,17 +33,26 @@ fn main() {
 }
 
 fn setup_render_state(mut commands: Commands) {
+	let mesh = MeshBuilder::new()
+		.as_circle(0.2)
+		.circle_points(3)
+		.with_color(WHITE)
+		.build();
 	commands.insert_resource(MeshHandle {
-		mesh: geometry::Mesh::circle(4, color::RED),
-		parts_count: 4,
+		mesh,
+		parts_count: 3,
 	});
 }
 
 fn change_on_click(mut mesh: ResMut<MeshHandle>, mut click: EventReader<MouseButtonInput>) {
 	for event in click.read() {
 		if event.state.is_pressed() {
-			mesh.parts_count = ((mesh.parts_count + 1) % 16).max(4);
-			mesh.mesh = geometry::Mesh::circle(mesh.parts_count, color::RED);
+			mesh.parts_count = ((mesh.parts_count + 1) % 64).max(4);
+			mesh.mesh = MeshBuilder::new()
+				.as_circle(0.2)
+				.circle_points(mesh.parts_count)
+				.with_color(WHITE)
+				.build();
 		}
 	}
 }
