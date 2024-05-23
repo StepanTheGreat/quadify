@@ -10,8 +10,8 @@ pub(crate) mod state;
 /// Initializes main window and starts the `miniquad` event loop.
 pub struct WindowPlugin {
 	pub title: String,
-	pub width: i32,
-	pub height: i32,
+	pub width: u32,
+	pub height: u32,
 	pub fullscreen: bool,
 	pub high_dpi: bool,
 	pub resizeable: bool,
