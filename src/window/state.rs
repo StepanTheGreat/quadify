@@ -15,13 +15,14 @@ use crate::render::RenderingBackend;
 /// General `miniquad` state handler for the entire app. It stores bevy's [`App`], manages its event loop and so on
 pub(crate) struct QuadifyState {
 	app: App,
+	previous_mouse_position: Option<Vec2>,
 }
 
 impl QuadifyState {
 	/// Creates a new `QuadifyState` object
 	pub(crate) fn new(mut app: App) -> Self {
 		app.insert_non_send_resource(RenderingBackend::new());
-		Self { app }
+		Self { app, previous_mouse_position: None }
 	}
 }
 
@@ -111,11 +112,6 @@ impl EventHandler for QuadifyState {
 
 	// Mouse Events
 	fn mouse_button_down_event(&mut self, button: miniquad::MouseButton, _x: f32, _y: f32) {
-		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
-			props.bypass_change_detection();
-			props.cursor_position = (_x, _y);
-		}
-
 		self.app.world.send_event(bevy_input::mouse::MouseButtonInput {
 			button: mq_to_bevy_mbtn(button),
 			state: ButtonState::Pressed,
@@ -124,23 +120,21 @@ impl EventHandler for QuadifyState {
 	}
 
 	fn mouse_motion_event(&mut self, x: f32, y: f32) {
+		// x and y are the absolute mouse position, not the delta
 		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
 			props.bypass_change_detection();
-			props.cursor_position.0 += x;
-			props.cursor_position.1 += y;
+			props.cursor_position = (x, y);
 		}
 
-		self.app.world.send_event(bevy_input::mouse::MouseMotion {
-			delta: vec2(x, y), // ! x, y here is not delta, but the absolute mouse position. This event is incorrect
-		});
+		let previous = self.previous_mouse_position.get_or_insert(vec2(x, y));
+		let delta = vec2(x, y) - *previous;
+
+		if delta != Vec2::ZERO {
+			self.app.world.send_event(bevy_input::mouse::MouseMotion { delta });
+		}
 	}
 
 	fn mouse_button_up_event(&mut self, button: miniquad::MouseButton, _x: f32, _y: f32) {
-		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
-			props.bypass_change_detection();
-			props.cursor_position = (_x, _y);
-		}
-
 		self.app.world.send_event(bevy_input::mouse::MouseButtonInput {
 			button: mq_to_bevy_mbtn(button),
 			state: ButtonState::Released,
@@ -149,11 +143,6 @@ impl EventHandler for QuadifyState {
 	}
 
 	fn mouse_wheel_event(&mut self, x: f32, y: f32) {
-		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
-			props.bypass_change_detection();
-			props.cursor_position = (x, y);
-		}
-
 		self.app.world.send_event(bevy_input::mouse::MouseWheel {
 			unit: MouseScrollUnit::Pixel,
 			x,

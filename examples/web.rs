@@ -18,10 +18,12 @@ fn main() {
 		.run();
 }
 
-fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>) {
-	for _event in keyboard_events.read() {
-		#[cfg(feature = "log")]
-		bevy_log::info!("Received Keyboard Event: {:?}", _event);
+fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>, _window_properties: ResMut<WindowProperties>) {
+	for event in keyboard_events.read() {
+		if event.key_code == KeyCode::Space {
+			#[cfg(feature = "log")]
+			bevy_log::info!("Approximate Mouse Position: {:?}", _window_properties.cursor_position());
+		}
 	}
 }
 
@@ -46,9 +48,6 @@ fn mouse_events(mut events: EventReader<MouseButtonInput>, mut idx: Local<usize>
 	];
 
 	for event in events.read() {
-		#[cfg(feature = "log")]
-		bevy_log::info!("Received Mouse Event: {:?}", event);
-
 		if event.state != ButtonState::Released {
 			continue;
 		}
