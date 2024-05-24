@@ -20,7 +20,7 @@ fn main() {
 
 fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>, _window_properties: ResMut<WindowProperties>) {
 	for event in keyboard_events.read() {
-		if event.key_code == KeyCode::Space {
+		if event.key_code == KeyCode::Space && event.state == ButtonState::Released {
 			#[cfg(feature = "log")]
 			bevy_log::info!("Current Mouse Position: {:?}", _window_properties.cursor_position());
 		}
