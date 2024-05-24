@@ -121,11 +121,6 @@ impl EventHandler for QuadifyState {
 
 	fn mouse_motion_event(&mut self, x: f32, y: f32) {
 		// x and y are the absolute mouse position, not the delta
-		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
-			props.bypass_change_detection();
-			props.cursor_position = (x, y);
-		}
-
 		let current = vec2(x, y);
 		let previous = self.mouse_position.get_or_insert(current);
 
@@ -136,6 +131,11 @@ impl EventHandler for QuadifyState {
 		}
 
 		self.mouse_position = Some(current);
+
+		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
+			props.bypass_change_detection();
+			props.cursor_position = current;
+		}
 	}
 
 	fn mouse_button_up_event(&mut self, button: miniquad::MouseButton, _x: f32, _y: f32) {

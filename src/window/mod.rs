@@ -70,7 +70,7 @@ impl Plugin for WindowPlugin {
 
 			cursor_grabbed: false,
 			cursor: miniquad::CursorIcon::Default,
-			cursor_position: (0f32, 0f32),
+			cursor_position: glam::Vec2::ZERO,
 		};
 
 		// Init Resources, Events, and Systems

@@ -22,7 +22,7 @@ fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>, _window_proper
 	for event in keyboard_events.read() {
 		if event.key_code == KeyCode::Space {
 			#[cfg(feature = "log")]
-			bevy_log::info!("Approximate Mouse Position: {:?}", _window_properties.cursor_position());
+			bevy_log::info!("Current Mouse Position: {:?}", _window_properties.cursor_position());
 		}
 	}
 }
@@ -54,7 +54,7 @@ fn mouse_events(mut events: EventReader<MouseButtonInput>, mut idx: Local<usize>
 
 		match event.button {
 			MouseButton::Right => {
-				let (x, y) = window_properties.cursor_position();
+				let glam::Vec2 { x, y } = window_properties.cursor_position();
 				clear_colour.0 = rgba::rgba(x / 600.0, y / 600.0, 0.5, 1.0);
 			}
 			MouseButton::Left => {

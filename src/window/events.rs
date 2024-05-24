@@ -32,12 +32,12 @@ pub struct WindowProperties {
 	pub(crate) window: Entity,
 
 	/// x and y position of the window
-	pub position: Option<(u32, u32)>,
+	pub position: Option<glam::u32::UVec2>,
 	pub width: u32,
 	pub height: u32,
 	pub fullscreen: bool,
 
-	pub(crate) cursor_position: (f32, f32),
+	pub(crate) cursor_position: glam::Vec2,
 	pub cursor_grabbed: bool,
 	pub cursor: CursorIcon,
 }
@@ -49,7 +49,7 @@ impl WindowProperties {
 	}
 
 	/// Get the position of the Mouse Cursor. Only updated on Mouse Input events.
-	pub fn cursor_position(&self) -> (f32, f32) {
+	pub fn cursor_position(&self) -> glam::Vec2 {
 		self.cursor_position
 	}
 }
@@ -82,8 +82,8 @@ pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<Windo
 				miniquad::window::set_mouse_cursor(properties.cursor);
 			}
 			if previous.position != properties.position {
-				if let Some((x, y)) = properties.position {
-					miniquad::window::set_window_position(x, y);
+				if let Some(p) = properties.position {
+					miniquad::window::set_window_position(p.x, p.y);
 				}
 			}
 		}
