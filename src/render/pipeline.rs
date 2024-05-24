@@ -1,15 +1,7 @@
-use super::{
-	geometry::Vertex,
-	rgba::{rgba, Rgba},
-};
+use super::{geometry::Vertex, rgba::rgba};
 use glam::{vec2, vec3};
 use miniquad::*;
 use std::collections::BTreeMap;
-
-const fn as_bytes<T, const SIZE: usize>() -> [u8; SIZE] {
-	debug_assert!(std::mem::size_of::<T>() == SIZE);
-	unsafe { std::mem::transmute([0u8; SIZE]) }
-}
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub struct GlPipeline(usize);

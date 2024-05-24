@@ -1,7 +1,6 @@
-use bevy::input::mouse::{MouseButtonInput, MouseMotion, MouseWheel};
-use bevy::prelude::*;
-use bevy_app::AppExit;
-use quadify::prelude::WindowPlugin;
+use bevy_app::{prelude::*, AppExit};
+use bevy_ecs::prelude::*;
+use bevy_input::{mouse::*, prelude::*};
 use quadify::prelude::*;
 
 const INPUT_NEEDED: u32 = 4;
@@ -9,11 +8,11 @@ const INPUT_NEEDED: u32 = 4;
 #[derive(Resource)]
 struct InputReceived(u32);
 
+
 //TODO: Add mouse position, mouse wheel resource check,
 
 #[test]
 fn main() {
-	println!("Hi, this is an interactive mouse input test. Please move, click and scroll your mouse!");
 	App::new()
 		.add_plugins(QuadifyPlugins.set(WindowPlugin {
 			title: "Read Mouse Events Test".to_string(),
@@ -24,6 +23,9 @@ fn main() {
 			..Default::default()
 		}))
 		.insert_resource(InputReceived(0))
+		.add_systems(Startup, || {
+			println!("Hi, this is an interactive mouse input test. Please move, click and scroll your mouse!");
+		})
 		.add_systems(Update, (mouse_btn_events, mouse_motion_events, mouse_scroll_events, mouse_button, close_when_received_all))
 		.run();
 }
