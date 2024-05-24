@@ -14,10 +14,8 @@ fn main() {
 			resizeable: true,
 			..Default::default()
 		}))
-		.add_systems(Startup, || {
-			println!("TIP: press ESC to quit the test!");
-		})
-		.add_systems(Update, (keyboard_events, quit_on_esc))
+		.add_systems(Startup, || println!("TIP: press ESC to quit the test!"))
+		.add_systems(Update, (keyboard_events, exit_on_esc))
 		.run();
 }
 
@@ -39,7 +37,7 @@ fn keyboard_events(mut events: EventReader<KeyboardInput>, mut window_properties
 
 			if let Key::Character(ref char) = event.logical_key {
 				if let Some(x) = char.parse::<u32>().ok() {
-					window_properties.position = Some((x * 100, 50));
+					window_properties.position = Some(glam::u32::UVec2::new(x * 100, 80));
 				}
 			}
 		}
