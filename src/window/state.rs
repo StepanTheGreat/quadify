@@ -89,6 +89,12 @@ impl EventHandler for QuadifyState {
 	}
 
 	fn resize_event(&mut self, width: f32, height: f32) {
+		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
+			props.bypass_change_detection();
+			props.width = width as u32;
+			props.height = height as u32;
+		}
+
 		self.app.world.send_event(events::WindowEvent::Resized { width, height });
 	}
 

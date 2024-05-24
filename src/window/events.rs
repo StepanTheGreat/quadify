@@ -2,10 +2,10 @@ use std::path::PathBuf;
 
 use bevy_app::AppExit;
 use bevy_ecs::{
-	change_detection::{DetectChanges, DetectChangesMut},
+	change_detection::DetectChanges,
 	entity::Entity,
 	event::{Event, EventReader, EventWriter},
-	system::{Local, Res, ResMut, Resource},
+	system::{Local, Res, Resource},
 };
 use bevy_input::keyboard::{KeyCode, KeyboardInput};
 use miniquad::CursorIcon;
@@ -44,6 +44,7 @@ pub struct WindowProperties {
 
 impl WindowProperties {
 	/// An empty entity that's used to identify the main window. Since `miniquad` doesn't support multiwindow.
+	/// Use it to cross check inputs, if they originate from the `miniquad` window
 	pub fn window(&self) -> Entity {
 		self.window
 	}
@@ -54,17 +55,7 @@ impl WindowProperties {
 	}
 }
 
-pub(crate) fn sync_window_properties(mut properties: ResMut<WindowProperties>, mut window_events: EventReader<WindowEvent>) {
-	let properties = properties.bypass_change_detection();
-	for event in window_events.read() {
-		if let WindowEvent::Resized { width, height } = event {
-			properties.width = *width as u32;
-			properties.height = *height as u32;
-		}
-	}
-}
-
-pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<WindowProperties>)>, properties: Res<WindowProperties>) {
+pub(crate) fn apply_window_properties(mut first_run: Local<(bool, Option<WindowProperties>)>, properties: Res<WindowProperties>) {
 	let (first_run, previous) = &mut *first_run;
 
 	if properties.is_changed() && *first_run {

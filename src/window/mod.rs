@@ -58,10 +58,8 @@ impl Plugin for WindowPlugin {
 			conf.platform = platform.clone();
 		}
 
-		let window_entity = app.world.spawn(()).id();
-
 		let window_properties = events::WindowProperties {
-			window: window_entity,
+			window: app.world.spawn(()).id(),
 
 			position: None,
 			width: self.width as u32,
@@ -106,7 +104,7 @@ impl Plugin for WindowPlugin {
 			.edit_schedule(state::MiniquadQuitRequestedSchedule, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.add_systems(Last, (events::enforce_window_properties, events::sync_window_properties, events::quit_on_app_exit));
+			.add_systems(Last, (events::apply_window_properties, events::quit_on_app_exit));
 
 		// Init Runner
 		app.set_runner(move |app| {
