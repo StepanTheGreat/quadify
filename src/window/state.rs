@@ -43,24 +43,24 @@ pub struct MiniquadEndDraw;
 
 /// Special Schedule called directly inside the Mouse Event handler.
 /// Allows users to run higher privilege code on the Web, as the Systems are run in the event listener's context.
-/// Use this, [`MiniquadMouseMotionEvent`] and the [`MiniquadKeyDownEvent`] Schedule to call `requestFullScreen` and other such Web APIs.
+/// Use this, [`MiniquadMouseMotionSchedule`] and the [`MiniquadKeyDownSchedule`] Schedule to call `requestFullScreen` and other such Web APIs.
 /// Such a Schedule has the least input latency from user input, and could serve such a low-latency purpose outside the web too.
-/// These input Schedules are run by the Single Threaded Executor.
+/// These input Schedules are run by with Single Threaded Executor.
 /// These Systems also don't have access to other Events, as they are run too early in the Update Cycle, before other Events are created.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct MiniquadMouseDownEvent;
+pub struct MiniquadMouseDownSchedule;
 
-/// Similar to [`MiniquadMouseDownEvent`] but runs within the `key_down_event` handler.
+/// Similar to [`MiniquadMouseDownSchedule`] but runs within the `key_down_event` handler.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct MiniquadKeyDownEvent;
+pub struct MiniquadKeyDownSchedule;
 
-/// Similar to [`MiniquadMouseDownEvent`] but runs within the `mouse_motion` handler.
+/// Similar to [`MiniquadMouseDownSchedule`] but runs within the `mouse_motion` handler.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct MiniquadMouseMotionEvent;
+pub struct MiniquadMouseMotionSchedule;
 
 /// Run when the user requests to quit the application, use this to set [`AcceptQuitRequest`]
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, ScheduleLabel)]
-pub struct MiniquadQuitRequestedEvent;
+pub struct MiniquadQuitRequestedSchedule;
 
 /// Use this to cancel a `quit` request.
 /// `true` to quit, `false` to cancel
@@ -93,7 +93,7 @@ impl EventHandler for QuadifyState {
 	}
 
 	fn quit_requested_event(&mut self) -> bool {
-		self.app.world.run_schedule(MiniquadQuitRequestedEvent);
+		self.app.world.run_schedule(MiniquadQuitRequestedSchedule);
 		self.app.world.resource::<AcceptQuitRequest>().0
 	}
 
@@ -117,6 +117,8 @@ impl EventHandler for QuadifyState {
 			state: ButtonState::Pressed,
 			window: Entity::PLACEHOLDER,
 		});
+
+		self.app.world.run_schedule(MiniquadMouseDownSchedule);
 	}
 
 	fn mouse_motion_event(&mut self, x: f32, y: f32) {
@@ -136,6 +138,8 @@ impl EventHandler for QuadifyState {
 			props.bypass_change_detection();
 			props.cursor_position = current;
 		}
+
+		self.app.world.run_schedule(MiniquadMouseMotionSchedule);
 	}
 
 	fn mouse_button_up_event(&mut self, button: miniquad::MouseButton, _x: f32, _y: f32) {
@@ -144,6 +148,8 @@ impl EventHandler for QuadifyState {
 			state: ButtonState::Released,
 			window: Entity::PLACEHOLDER,
 		});
+
+		self.app.world.run_schedule(MiniquadMouseDownSchedule);
 	}
 
 	fn mouse_wheel_event(&mut self, x: f32, y: f32) {
@@ -183,7 +189,8 @@ impl EventHandler for QuadifyState {
 			logical_key: mq_to_bevy_logical_key(keycode),
 			window: Entity::PLACEHOLDER,
 		});
-		self.app.world.run_schedule(MiniquadKeyDownEvent);
+
+		self.app.world.run_schedule(MiniquadKeyDownSchedule);
 	}
 
 	fn key_up_event(&mut self, keycode: miniquad::KeyCode, _mods: miniquad::KeyMods) {

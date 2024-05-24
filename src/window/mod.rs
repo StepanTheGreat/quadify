@@ -90,20 +90,20 @@ impl Plugin for WindowPlugin {
 			.edit_schedule(state::MiniquadEndDraw, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.init_schedule(state::MiniquadKeyDownEvent)
-			.edit_schedule(state::MiniquadKeyDownEvent, |s| {
+			.init_schedule(state::MiniquadKeyDownSchedule)
+			.edit_schedule(state::MiniquadKeyDownSchedule, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.init_schedule(state::MiniquadMouseDownEvent)
-			.edit_schedule(state::MiniquadMouseDownEvent, |s| {
+			.init_schedule(state::MiniquadMouseDownSchedule)
+			.edit_schedule(state::MiniquadMouseDownSchedule, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.init_schedule(state::MiniquadMouseMotionEvent)
-			.edit_schedule(state::MiniquadMouseMotionEvent, |s| {
+			.init_schedule(state::MiniquadMouseMotionSchedule)
+			.edit_schedule(state::MiniquadMouseMotionSchedule, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.init_schedule(state::MiniquadQuitRequestedEvent)
-			.edit_schedule(state::MiniquadQuitRequestedEvent, |s| {
+			.init_schedule(state::MiniquadQuitRequestedSchedule)
+			.edit_schedule(state::MiniquadQuitRequestedSchedule, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
 			.add_systems(Last, (events::enforce_window_properties, events::sync_window_properties, events::quit_on_app_exit));

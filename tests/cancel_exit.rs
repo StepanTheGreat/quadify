@@ -20,7 +20,7 @@ fn main() {
 		.add_systems(Startup, || {
 			println!("User needs to attempt Quitting the application twice to exit.");
 		})
-		.add_systems(MiniquadQuitRequestedEvent, toggle_exit)
+		.add_systems(MiniquadQuitRequestedSchedule, toggle_exit)
 		// Run a System just before the application Quits
 		.add_systems(Last, |mut quit: EventReader<AppExit>, tick: Res<bevy_time::Time>| {
 			for _ in quit.read() {

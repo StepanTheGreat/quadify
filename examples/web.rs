@@ -11,7 +11,7 @@ fn main() {
 			width: 600,
 			height: 600,
 			high_dpi: true,
-			resizeable: true,
+			resizeable: false,
 			..Default::default()
 		}))
 		.add_systems(Update, (read_keyboard, quit_on_esc, file_drop_events, mouse_events))
@@ -41,9 +41,7 @@ fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>, mut window_pro
 				_ => None,
 			};
 
-			if let Some(width) = width {
-				window_properties.width = (width + 1) * 100;
-			}
+			width.map(|w| window_properties.width = (w + 1) * 100);
 		}
 	}
 }
