@@ -58,8 +58,10 @@ impl Plugin for WindowPlugin {
 			conf.platform = platform.clone();
 		}
 
+		// Empty entity to identify the main window, for compatibility with Bevy's multiwindow support
+		let window_entity = app.world.spawn(()).id();
 		let window_properties = events::WindowProperties {
-			window: app.world.spawn(()).id(),
+			window: window_entity,
 
 			position: None,
 			width: self.width as u32,
@@ -108,7 +110,7 @@ impl Plugin for WindowPlugin {
 
 		// Init Runner
 		app.set_runner(move |app| {
-			miniquad::start(conf, move || Box::new(state::QuadifyState::new(app)));
+			miniquad::start(conf, move || Box::new(state::QuadifyState::new(app, window_entity)));
 		});
 	}
 }

@@ -8,7 +8,7 @@ use bevy_ecs::{
 	system::{Local, Res, Resource},
 };
 use bevy_input::keyboard::{KeyCode, KeyboardInput};
-use miniquad::CursorIcon;
+pub use miniquad::CursorIcon;
 
 #[derive(Debug, Clone, Event)]
 pub enum WindowEvent {

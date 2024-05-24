@@ -16,13 +16,18 @@ use crate::render::RenderingBackend;
 pub(crate) struct QuadifyState {
 	app: App,
 	mouse_position: Option<Vec2>,
+	window_entity: Entity,
 }
 
 impl QuadifyState {
 	/// Creates a new `QuadifyState` object
-	pub(crate) fn new(mut app: App) -> Self {
+	pub(crate) fn new(mut app: App, window_entity: Entity) -> Self {
 		app.insert_non_send_resource(RenderingBackend::new());
-		Self { app, mouse_position: None }
+		Self {
+			app,
+			mouse_position: None,
+			window_entity,
+		}
 	}
 }
 
@@ -123,7 +128,7 @@ impl EventHandler for QuadifyState {
 		self.app.world.send_event(bevy_input::mouse::MouseButtonInput {
 			button: mq_to_bevy_mbtn(button),
 			state: ButtonState::Pressed,
-			window: Entity::PLACEHOLDER,
+			window: self.window_entity,
 		});
 
 		self.app.world.run_schedule(MiniquadMouseDownSchedule);
@@ -152,7 +157,7 @@ impl EventHandler for QuadifyState {
 		self.app.world.send_event(bevy_input::mouse::MouseButtonInput {
 			button: mq_to_bevy_mbtn(button),
 			state: ButtonState::Released,
-			window: Entity::PLACEHOLDER,
+			window: self.window_entity,
 		});
 
 		self.app.world.run_schedule(MiniquadMouseDownSchedule);
@@ -163,7 +168,7 @@ impl EventHandler for QuadifyState {
 			unit: MouseScrollUnit::Pixel,
 			x,
 			y,
-			window: Entity::PLACEHOLDER,
+			window: self.window_entity,
 		});
 	}
 
@@ -174,7 +179,7 @@ impl EventHandler for QuadifyState {
 			position: Vec2 { x, y },
 			id,
 			force: None,
-			window: Entity::PLACEHOLDER,
+			window: self.window_entity,
 		});
 	}
 
@@ -184,7 +189,7 @@ impl EventHandler for QuadifyState {
 			key_code: KeyCode::Unidentified(NativeKeyCode::Unidentified),
 			state: ButtonState::Pressed, // ! Could be another bug, since the char state would always be `ButtonState::Pressed`
 			logical_key: mq_to_bevy_char(character),
-			window: Entity::PLACEHOLDER,
+			window: self.window_entity,
 		});
 	}
 
@@ -193,7 +198,7 @@ impl EventHandler for QuadifyState {
 			key_code: mq_to_bevy_keycode(keycode),
 			state: ButtonState::Pressed,
 			logical_key: mq_to_bevy_logical_key(keycode),
-			window: Entity::PLACEHOLDER,
+			window: self.window_entity,
 		});
 
 		self.app.world.run_schedule(MiniquadKeyDownSchedule);
@@ -204,7 +209,7 @@ impl EventHandler for QuadifyState {
 			key_code: mq_to_bevy_keycode(keycode),
 			state: ButtonState::Released,
 			logical_key: mq_to_bevy_logical_key(keycode),
-			window: Entity::PLACEHOLDER,
+			window: self.window_entity,
 		});
 	}
 }

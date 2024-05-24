@@ -1,13 +1,12 @@
 use bevy_app::prelude::*;
 use bevy_ecs::prelude::*;
 use bevy_input::{keyboard::KeyboardInput, mouse::MouseButtonInput, prelude::*, ButtonState};
-use miniquad::CursorIcon;
 use quadify::prelude::*;
 
 fn main() {
 	App::new()
 		.add_plugins(QuadifyPlugins.set(WindowPlugin {
-			title: "Read Keyboard Events Test".to_string(),
+			title: "Comprehensive Web Platform Test".to_string(),
 			width: 600,
 			height: 600,
 			high_dpi: true,
@@ -74,7 +73,11 @@ fn mouse_events(mut events: EventReader<MouseButtonInput>, mut idx: Local<usize>
 		match event.button {
 			MouseButton::Right => {
 				let glam::Vec2 { x, y } = window_properties.cursor_position();
-				clear_colour.0 = rgba::rgba(x / 600.0, y / 600.0, 0.5, 1.0);
+
+				let r = (x / window_properties.height as f32) * 255.0;
+				let g = (y / window_properties.width as f32) * 255.0;
+
+				clear_colour.0 = rgba::rgba(r as u8, g as u8, 128, 255);
 			}
 			MouseButton::Left => {
 				window_properties.cursor_grabbed = !window_properties.cursor_grabbed;
