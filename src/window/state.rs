@@ -15,14 +15,14 @@ use crate::render::RenderingBackend;
 /// General `miniquad` state handler for the entire app. It stores bevy's [`App`], manages its event loop and so on
 pub(crate) struct QuadifyState {
 	app: App,
-	previous_mouse_position: Option<Vec2>,
+	mouse_position: Option<Vec2>,
 }
 
 impl QuadifyState {
 	/// Creates a new `QuadifyState` object
 	pub(crate) fn new(mut app: App) -> Self {
 		app.insert_non_send_resource(RenderingBackend::new());
-		Self { app, previous_mouse_position: None }
+		Self { app, mouse_position: None }
 	}
 }
 
@@ -126,12 +126,16 @@ impl EventHandler for QuadifyState {
 			props.cursor_position = (x, y);
 		}
 
-		let previous = self.previous_mouse_position.get_or_insert(vec2(x, y));
-		let delta = vec2(x, y) - *previous;
+		let current = vec2(x, y);
+		let previous = self.mouse_position.get_or_insert(current);
 
-		if delta != Vec2::ZERO {
+		// only send mouse motion events if the mouse has moved
+		if current != *previous {
+			let delta = vec2(x, y) - *previous;
 			self.app.world.send_event(bevy_input::mouse::MouseMotion { delta });
 		}
+
+		self.mouse_position = Some(current);
 	}
 
 	fn mouse_button_up_event(&mut self, button: miniquad::MouseButton, _x: f32, _y: f32) {
