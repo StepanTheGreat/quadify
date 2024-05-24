@@ -18,11 +18,32 @@ fn main() {
 		.run();
 }
 
-fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>, _window_properties: ResMut<WindowProperties>) {
+fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>, mut window_properties: ResMut<WindowProperties>) {
 	for event in keyboard_events.read() {
-		if event.key_code == KeyCode::Space && event.state == ButtonState::Released {
-			#[cfg(feature = "log")]
-			bevy_log::info!("Current Mouse Position: {:?}", _window_properties.cursor_position());
+		if event.state == ButtonState::Released {
+			let width = match event.key_code {
+				KeyCode::Space => {
+					#[cfg(feature = "log")]
+					bevy_log::info!("Current Mouse Position: {:?}", window_properties.cursor_position());
+					None
+				}
+				// TODO: input lag! we need to rework miniquad to some degree
+				KeyCode::Digit0 => Some(0),
+				KeyCode::Digit1 => Some(1),
+				KeyCode::Digit2 => Some(2),
+				KeyCode::Digit3 => Some(3),
+				KeyCode::Digit4 => Some(4),
+				KeyCode::Digit5 => Some(5),
+				KeyCode::Digit6 => Some(6),
+				KeyCode::Digit7 => Some(7),
+				KeyCode::Digit8 => Some(8),
+				KeyCode::Digit9 => Some(9),
+				_ => None,
+			};
+
+			if let Some(width) = width {
+				window_properties.width = (width + 1) * 100;
+			}
 		}
 	}
 }
