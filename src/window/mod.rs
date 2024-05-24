@@ -6,13 +6,12 @@ mod conversions;
 pub(crate) mod events;
 pub(crate) mod icon;
 pub(crate) mod state;
-pub(crate) mod tick;
 
 /// Initializes main window and starts the `miniquad` event loop.
 pub struct WindowPlugin {
 	pub title: String,
-	pub width: i32,
-	pub height: i32,
+	pub width: u32,
+	pub height: u32,
 	pub fullscreen: bool,
 	pub high_dpi: bool,
 	pub resizeable: bool,
@@ -59,22 +58,23 @@ impl Plugin for WindowPlugin {
 			conf.platform = platform.clone();
 		}
 
-		let window_entity = app.world.spawn(()).id();
-
 		let window_properties = events::WindowProperties {
-			fullscreen: self.fullscreen,
+			window: app.world.spawn(()).id(),
+
+			position: None,
 			width: self.width as u32,
 			height: self.height as u32,
+			fullscreen: self.fullscreen,
+
 			cursor_grabbed: false,
 			cursor: miniquad::CursorIcon::Default,
-			window: window_entity,
+			cursor_position: glam::Vec2::ZERO,
 		};
 
 		// Init Resources, Events, and Systems
 		app.add_event::<events::WindowEvent>()
 			.add_event::<events::DroppedFileEvent>()
 			.insert_resource(window_properties)
-			.insert_resource(tick::GameTick(0))
 			.insert_resource(state::AcceptQuitRequest(true))
 			.init_schedule(state::MiniquadPrepareDraw)
 			.edit_schedule(state::MiniquadPrepareDraw, |s| {
@@ -88,26 +88,23 @@ impl Plugin for WindowPlugin {
 			.edit_schedule(state::MiniquadEndDraw, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.init_schedule(state::MiniquadKeyDownEvent)
-			.edit_schedule(state::MiniquadKeyDownEvent, |s| {
+			.init_schedule(state::MiniquadKeyDownSchedule)
+			.edit_schedule(state::MiniquadKeyDownSchedule, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.init_schedule(state::MiniquadMouseDownEvent)
-			.edit_schedule(state::MiniquadMouseDownEvent, |s| {
+			.init_schedule(state::MiniquadMouseDownSchedule)
+			.edit_schedule(state::MiniquadMouseDownSchedule, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.init_schedule(state::MiniquadMouseMotionEvent)
-			.edit_schedule(state::MiniquadMouseMotionEvent, |s| {
+			.init_schedule(state::MiniquadMouseMotionSchedule)
+			.edit_schedule(state::MiniquadMouseMotionSchedule, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.init_schedule(state::MiniquadQuitRequestedEvent)
-			.edit_schedule(state::MiniquadQuitRequestedEvent, |s| {
+			.init_schedule(state::MiniquadQuitRequestedSchedule)
+			.edit_schedule(state::MiniquadQuitRequestedSchedule, |s| {
 				s.set_executor_kind(ExecutorKind::SingleThreaded);
 			})
-			.add_systems(
-				Last,
-				(events::enforce_window_properties, events::sync_window_properties, events::quit_on_app_exit, tick::update_game_tick),
-			);
+			.add_systems(Last, (events::apply_window_properties, events::quit_on_app_exit));
 
 		// Init Runner
 		app.set_runner(move |app| {

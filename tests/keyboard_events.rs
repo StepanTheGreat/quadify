@@ -5,8 +5,6 @@ use quadify::prelude::*;
 
 #[test]
 fn main() {
-	println!("TIP: press ESC to quit the test!");
-
 	App::new()
 		.add_plugins(QuadifyPlugins.set(WindowPlugin {
 			title: "Read Keyboard Events Test".to_string(),
@@ -16,6 +14,9 @@ fn main() {
 			resizeable: true,
 			..Default::default()
 		}))
+		.add_systems(Startup, || {
+			println!("TIP: press ESC to quit the test!");
+		})
 		.add_systems(Update, (keyboard_events, quit_on_esc))
 		.run();
 }
@@ -35,8 +36,11 @@ fn keyboard_events(mut events: EventReader<KeyboardInput>, mut window_properties
 				KeyCode::KeyR => window_properties.cursor_grabbed = !window_properties.cursor_grabbed,
 				_ => println!("Some other keycode"),
 			}
+
 			if let Key::Character(ref char) = event.logical_key {
-				println!("Character key: {:?}", char);
+				if let Some(x) = char.parse::<u32>().ok() {
+					window_properties.position = Some((x * 100, 50));
+				}
 			}
 		}
 	}

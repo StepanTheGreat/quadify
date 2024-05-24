@@ -16,6 +16,9 @@ impl Vertex {
 	pub fn new(position: Vec3, uv: Vec2, color: Rgba) -> Self {
 		Self { position, uv, color }
 	}
+	pub fn new(position: Vec3, uv: Vec2, color: Rgba) -> Self {
+		Self { position, uv, color }
+	}
 
 	/// Default's vertex attributes constant
 	pub const fn attributes() -> [VertexAttribute; 3] {
@@ -28,6 +31,10 @@ impl Vertex {
 }
 
 pub struct Mesh {
+	pub vertices: Vec<Vertex>,
+	pub indices: Vec<u16>,
+	pub texture: Option<TextureId>,
+	// TODO: TextureId should probably be swapped with some abstracted Texture Handle.
 	pub vertices: Vec<Vertex>,
 	pub indices: Vec<u16>,
 	pub texture: Option<TextureId>,
@@ -46,13 +53,34 @@ impl Mesh {
 		];
 		Self { vertices, indices, texture: None }
 	}
+	/// Makes a simple quad mesh
+	pub fn quad(color: Rgba) -> Self {
+		let indices = vec![0, 1, 2, 0, 2, 3];
+		let vertices = vec![
+			Vertex::new(vec3(-1.0, 1.0, 0.0), vec2(0.0, 0.0), color),  // top-left
+			Vertex::new(vec3(1.0, 1.0, 0.0), vec2(1.0, 0.0), color),   // top-right
+			Vertex::new(vec3(-1.0, -1.0, 0.0), vec2(0.0, 1.0), color), // bottom-left
+			Vertex::new(vec3(1.0, -1.0, 0.0), vec2(1.0, 1.0), color),  // bottom-right
+		];
+		Self { vertices, indices, texture: None }
+	}
 
 	/// Makes a circle mesh, with a specified amount of points
 	pub fn circle(npoints: u32, color: Rgba) -> Self {
 		assert!(npoints >= 4, "Not enough points to represent a circle mesh");
 		let mut indices: Vec<u16> = vec![];
 		let mut vertices: Vec<Vertex> = vec![];
+	/// Makes a circle mesh, with a specified amount of points
+	pub fn circle(npoints: u32, color: Rgba) -> Self {
+		assert!(npoints >= 4, "Not enough points to represent a circle mesh");
+		let mut indices: Vec<u16> = vec![];
+		let mut vertices: Vec<Vertex> = vec![];
 
+		let circle_piece = 2.0 * PI / (npoints as f32);
+		for i in 0..npoints {
+			let degrees = (i as f32) * circle_piece;
+			let (x, y) = (degrees.cos(), degrees.sin());
+			vertices.push(Vertex::new(vec3(x, y, 0.0), vec2(x, y), color));
 		let circle_piece = 2.0 * PI / (npoints as f32);
 		for i in 0..npoints {
 			let degrees = (i as f32) * circle_piece;
@@ -67,4 +95,7 @@ impl Mesh {
 
 		Self { vertices, indices, texture: None }
 	}
+		Self { vertices, indices, texture: None }
+	}
 }
+

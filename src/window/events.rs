@@ -2,15 +2,15 @@ use std::path::PathBuf;
 
 use bevy_app::AppExit;
 use bevy_ecs::{
-	change_detection::{DetectChanges, DetectChangesMut},
+	change_detection::DetectChanges,
 	entity::Entity,
 	event::{Event, EventReader, EventWriter},
-	system::{Local, Res, ResMut, Resource},
+	system::{Local, Res, Resource},
 };
 use bevy_input::keyboard::{KeyCode, KeyboardInput};
 use miniquad::CursorIcon;
 
-#[derive(Debug, Clone, Copy, Event)]
+#[derive(Debug, Clone, Event)]
 pub enum WindowEvent {
 	/// The window was minimized, `blur` event on Web
 	Minimized,
@@ -23,38 +23,37 @@ pub enum WindowEvent {
 		/// New height of the window
 		height: f32,
 	},
-	/// The window has been requested to exit
-	CloseRequested,
 }
 
-#[derive(Debug, Clone, Copy, Resource)]
+#[derive(Debug, Clone, Resource)]
 pub struct WindowProperties {
-	pub fullscreen: bool,
+	pub(crate) window: Entity,
+
+	/// x and y position of the window
+	pub position: Option<glam::u32::UVec2>,
 	pub width: u32,
 	pub height: u32,
+	pub fullscreen: bool,
+
+	pub(crate) cursor_position: glam::Vec2,
 	pub cursor_grabbed: bool,
 	pub cursor: CursorIcon,
-	pub(crate) window: Entity,
 }
 
 impl WindowProperties {
 	/// An empty entity that's used to identify the main window. Since `miniquad` doesn't support multiwindow.
+	/// Use it to cross check inputs, if they originate from the `miniquad` window
 	pub fn window(&self) -> Entity {
 		self.window
 	}
-}
 
-pub(crate) fn sync_window_properties(mut properties: ResMut<WindowProperties>, mut window_events: EventReader<WindowEvent>) {
-	let properties = properties.bypass_change_detection();
-	for event in window_events.read() {
-		if let WindowEvent::Resized { width, height } = event {
-			properties.width = *width as u32;
-			properties.height = *height as u32;
-		}
+	/// Get the position of the Mouse Cursor. Only updated on Mouse Input events.
+	pub fn cursor_position(&self) -> glam::Vec2 {
+		self.cursor_position
 	}
 }
 
-pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<WindowProperties>)>, properties: Res<WindowProperties>) {
+pub(crate) fn apply_window_properties(mut first_run: Local<(bool, Option<WindowProperties>)>, properties: Res<WindowProperties>) {
 	let (first_run, previous) = &mut *first_run;
 
 	if properties.is_changed() && *first_run {
@@ -71,11 +70,16 @@ pub(crate) fn enforce_window_properties(mut first_run: Local<(bool, Option<Windo
 			if previous.cursor != properties.cursor {
 				miniquad::window::set_mouse_cursor(properties.cursor);
 			}
+			if previous.position != properties.position {
+				if let Some(p) = properties.position {
+					miniquad::window::set_window_position(p.x, p.y);
+				}
+			}
 		}
 	}
 
-	*previous = Some(*properties);
-	*first_run = true; // first run is inverted XD
+	*previous = Some(properties.clone());
+	*first_run = true; // first run is inverted
 }
 
 /// Exits the application when the escape key is pressed

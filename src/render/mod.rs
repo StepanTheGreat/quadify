@@ -122,6 +122,9 @@ impl RenderingBackend {
 		self.draw_calls_count = 0;
 	}
 
+	pub(crate) fn draw(&mut self, projection: glam::Mat4) {}
+
+	pub fn set_camera(&mut self, camera: camera::Camera2D) {}
 	/// Reset internal state to known default
 	pub fn reset(&mut self) {
 		self.state.clip = None;
