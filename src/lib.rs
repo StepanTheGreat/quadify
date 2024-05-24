@@ -1,8 +1,8 @@
 /// Simplified import for all the crate's types and functions
 pub mod prelude {
 	pub use crate::io::*;
-	pub use crate::render::{camera::*, *};
-	pub use crate::window::{events::*, icon::*, state::*, tick::*, *};
+	pub use crate::render::{camera::*, geometry::*, *};
+	pub use crate::window::{events::*, icon::*, state::*, *};
 	pub use crate::QuadifyPlugins;
 
 	pub use glam;
@@ -26,14 +26,17 @@ pub struct QuadifyPlugins;
 
 impl PluginGroup for QuadifyPlugins {
 	fn build(self) -> PluginGroupBuilder {
+		#[allow(unused_mut)]
 		let mut builder = PluginGroupBuilder::start::<Self>()
 			.add(InputPlugin)
 			.add(render::RenderBackendPlugin)
 			.add(window::WindowPlugin::default());
+
 		#[cfg(feature = "log")]
 		{
 			builder = builder.add(bevy_log::LogPlugin::default());
 		}
+
 		builder
 	}
 }

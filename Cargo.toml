@@ -29,7 +29,7 @@ git = "https://github.com/sokorototo/miniquad-wasm-bindgen"
 
 [dev-dependencies]
 image = { version = "*", features = ["png"], default-features = false }
-bevy = { version = "0.13", features = ["multi-threaded"], default-features = false }
+bevy_time = { version = "0.13.2", default-features = false }
 
 [features]
 log = ["bevy_log"]

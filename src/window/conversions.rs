@@ -25,7 +25,7 @@ pub fn mq_to_bevy_mbtn(mbtn: MMouseButton) -> BMouseButton {
 		MMouseButton::Left => BMouseButton::Left,
 		MMouseButton::Right => BMouseButton::Right,
 		MMouseButton::Middle => BMouseButton::Middle,
-		MMouseButton::Other(_) => BMouseButton::Other(0), // ! Magic number
+		MMouseButton::Other(b) => BMouseButton::Other(b as _), // Only really makes sense on the web
 	}
 }
 
@@ -156,7 +156,7 @@ pub fn mq_to_bevy_keycode(key: MKeyCode) -> BKeyCode {
 	}
 }
 
-pub fn mq_to_bevy_logickey(key: MKeyCode) -> BKey {
+pub fn mq_to_bevy_logical_key(key: MKeyCode) -> BKey {
 	match key {
 		MKeyCode::Space => BKey::Space,
 		MKeyCode::World1 => BKey::Unidentified(NativeKey::Unidentified), // ! None
