@@ -83,7 +83,7 @@ pub(crate) fn apply_window_properties(mut first_run: Local<(bool, Option<WindowP
 }
 
 /// Exits the application when the escape key is pressed
-pub fn quit_on_esc(mut keyboard_input: EventReader<KeyboardInput>, mut app_exit: EventWriter<AppExit>) {
+pub fn exit_on_esc(mut keyboard_input: EventReader<KeyboardInput>, mut app_exit: EventWriter<AppExit>) {
 	for event in keyboard_input.read() {
 		if event.state.is_pressed() && event.key_code == KeyCode::Escape {
 			app_exit.send(AppExit);

@@ -1,12 +1,12 @@
 /// This test should be changed in the future to use more higher-level functionality like `Material`s, to avoid writing repetitive shaders;
 /// Thus this test is only for mesh demonstration purposes.
-use bevy::prelude::*;
+use bevy_app::prelude::*;
+use bevy_ecs::prelude::*;
 use bevy_input::mouse::MouseButtonInput;
-use quadify::color::rgba;
-use quadify::prelude::geometry::{Mesh, Vertex};
-use quadify::prelude::RenderingBackend;
-use quadify::prelude::WindowPlugin;
+use bevy_input::prelude::*;
+
 use quadify::{color, prelude::*};
+use glam::Mat4;
 
 #[derive(Resource)]
 struct MeshHandle {
@@ -49,7 +49,7 @@ fn change_on_click(mut mesh: ResMut<MeshHandle>, mut click: EventReader<MouseBut
 
 fn draw_circle(mesh: Res<MeshHandle>, mut render_ctx: NonSendMut<RenderingBackend>) {
 	let (verts, inds) = (&mesh.mesh.vertices, &mesh.mesh.indices);
-	render_ctx.clear(rgba(0, 0, 0, 0));
+	render_ctx.clear(color::rgba(0, 0, 0, 0));
 	render_ctx.texture(None);
 	render_ctx.draw_mode(pipeline::DrawMode::Triangles);
 	render_ctx.geometry(&verts[..], &inds[..]);

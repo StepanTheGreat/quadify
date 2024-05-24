@@ -13,7 +13,7 @@ fn main() {
 			resizeable: false,
 			..Default::default()
 		}))
-		.add_systems(Update, (read_keyboard, quit_on_esc, file_drop_events, mouse_events))
+		.add_systems(Update, (read_keyboard, exit_on_esc, file_drop_events, mouse_events))
 		.run();
 }
 
