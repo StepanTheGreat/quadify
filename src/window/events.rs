@@ -23,8 +23,6 @@ pub enum WindowEvent {
 		/// New height of the window
 		height: f32,
 	},
-	/// The window has been requested to exit
-	CloseRequested,
 }
 
 #[derive(Debug, Clone, Resource)]

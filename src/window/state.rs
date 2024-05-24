@@ -90,7 +90,9 @@ impl EventHandler for QuadifyState {
 
 	fn resize_event(&mut self, width: f32, height: f32) {
 		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
-			props.bypass_change_detection();
+			// to avoid infinite looping once WindowProperties is applied to the miniquad::window
+			let props = props.bypass_change_detection();
+
 			props.width = width as u32;
 			props.height = height as u32;
 		}
@@ -138,13 +140,11 @@ impl EventHandler for QuadifyState {
 			self.app.world.send_event(bevy_input::mouse::MouseMotion { delta });
 		}
 
-		self.mouse_position = Some(current);
-
 		if let Some(mut props) = self.app.world.get_resource_mut::<events::WindowProperties>() {
-			props.bypass_change_detection();
-			props.cursor_position = current;
+			props.bypass_change_detection().cursor_position = current;
 		}
 
+		self.mouse_position = Some(current);
 		self.app.world.run_schedule(MiniquadMouseMotionSchedule);
 	}
 
