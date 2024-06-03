@@ -1,57 +1,55 @@
 use std::f32::consts::PI;
 
 use super::rgba::Rgba;
+use bevy_asset::Asset;
 use bevy_ecs::component::Component;
+use bevy_reflect::Reflect;
 use glam::{vec2, vec3, Vec2, Vec3};
-use image::Rgb;
-use miniquad::{TextureId, VertexAttribute, VertexFormat};
+use miniquad::{VertexAttribute, VertexFormat};
 
 #[repr(C)]
-#[derive(Clone, Debug, Copy)]
+#[derive(Clone, Debug, Copy, Reflect, PartialEq)]
 pub struct Vertex {
 	pub position: Vec3,
 	pub uv: Vec2,
-	pub color: Rgba,
 }
 
 impl Vertex {
-	pub fn new(position: Vec3, uv: Vec2, color: Rgba) -> Self {
-		Self { position, uv, color }
+	pub fn new(position: Vec3, uv: Vec2) -> Self {
+		Self { position, uv }
 	}
 
 	/// Default's vertex attributes constant
-	pub const fn attributes() -> [VertexAttribute; 3] {
+	pub const fn attributes() -> [VertexAttribute; 2] {
 		[
 			VertexAttribute::new("position", VertexFormat::Float3),
 			VertexAttribute::new("texcoord", VertexFormat::Float2),
-			VertexAttribute::new("color0", VertexFormat::Byte4),
 		]
 	}
 }
 
+#[derive(Asset, Clone, PartialEq, Reflect)]
 pub struct Mesh {
 	pub vertices: Vec<Vertex>,
 	pub indices: Vec<u16>,
-	pub texture: Option<TextureId>,
-	// TODO: TextureId should probably be swapped with some abstracted Texture Handle.
 }
 
 impl Mesh {
 	/// Makes a simple quad mesh
-	fn quad(size: Vec2, color: Rgba) -> Self {
+	fn quad(size: Vec2) -> Self {
 		let indices = vec![0, 1, 2, 0, 2, 3];
 		let (hw, hh) = (size.x/2.0, size.y/2.0);
 		let vertices = vec![
-			Vertex::new(vec3(-hw, hh, 0.0), vec2(0.0, 0.0), color),  // top-left
-			Vertex::new(vec3(hw, hh, 0.0), vec2(1.0, 0.0), color),   // top-right
-			Vertex::new(vec3(-hw, -hh, 0.0), vec2(0.0, 1.0), color), // bottom-left
-			Vertex::new(vec3(hw, -hh, 0.0), vec2(1.0, 1.0), color),  // bottom-right
+			Vertex::new(vec3(-hw, hh, 0.0), vec2(0.0, 0.0)),  // top-left
+			Vertex::new(vec3(hw, hh, 0.0), vec2(1.0, 0.0)),   // top-right
+			Vertex::new(vec3(-hw, -hh, 0.0), vec2(0.0, 1.0)), // bottom-left
+			Vertex::new(vec3(hw, -hh, 0.0), vec2(1.0, 1.0)),  // bottom-right
 		];
-		Self { vertices, indices, texture: None }
+		Self { vertices, indices }
 	}
 
 	/// Makes a circle mesh, with a specified amount of points
-	fn circle(npoints: u32, r: f32, color: Rgba) -> Self {
+	fn circle(npoints: u32, r: f32) -> Self {
 		assert!(npoints >= 3, "Not enough points to represent a circle mesh. Minimum is 3");
 		let mut indices: Vec<u16> = vec![];
 		let mut vertices: Vec<Vertex> = vec![];
@@ -60,14 +58,14 @@ impl Mesh {
 		for i in 0..npoints {
 			let degrees = (i as f32) * circle_piece;
 			let (x, y) = (degrees.cos(), degrees.sin());
-			vertices.push(Vertex::new(vec3(x*r, y*r, 0.0), vec2(x, y), color));
+			vertices.push(Vertex::new(vec3(x*r, y*r, 0.0), vec2(x, y)));
 
 			if i < npoints-2 {
 				let i = i as u16;
 				indices.append(&mut vec![0, i+1, i+2]);
 			}
 		}
-		Self { vertices, indices, texture: None }
+		Self { vertices, indices }
 	}
 }
 
@@ -80,7 +78,6 @@ enum MeshShape {
 
 /// A Mesh constructor for generating/loading meshes. Meshes in `quadify` also contain color information
 pub struct MeshBuilder {
-	color: Option<Rgba>,
 	shape: Option<MeshShape>,
 	circle_points: u32
 }
@@ -88,16 +85,9 @@ pub struct MeshBuilder {
 impl MeshBuilder {
 	pub fn new() -> Self {
 		Self {
-			color: None,
 			shape: None,
 			circle_points: 20
 		}
-	}
-
-	/// Set meshe's color
-	pub fn with_color(&mut self, color: Rgba) -> &mut Self {
-		self.color = Some(color);
-		self
 	}
 
 	/// Generates a quad mesh, with a specified size
@@ -127,15 +117,13 @@ impl MeshBuilder {
 	/// *Note: panics if the shape wasn't provided*
 	pub fn build(&mut self) -> Mesh {
 		assert!(self.shape.is_some(), "Can't build a Mesh without shape parameter provided.");
-		
-		let color = self.color.unwrap_or_default();
 		// Should unwrap thanks to the previous `assert`
 		match self.shape.take().unwrap() {
 			MeshShape::Quad(size) => {
-				Mesh::quad(size, color)
+				Mesh::quad(size)
 			},
 			MeshShape::Circle(r) => {
-				Mesh::circle(self.circle_points, r, color)
+				Mesh::circle(self.circle_points, r)
 			}
 		}
 	}
