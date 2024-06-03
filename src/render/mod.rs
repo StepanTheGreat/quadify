@@ -1,14 +1,20 @@
+use bevy_asset::Handle;
 use bevy_ecs::system::{NonSendMut, Query, Res, Resource};
 use glam::{vec2, vec3};
 use miniquad::*;
 use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 
-use self::geometry::Vertex;
+use self::geometry::{Mesh, Vertex};
+use self::material::Material;
 use self::rgba::Rgba;
 use crate::window::state;
 
-use super::render::pipeline::*;
+use super::render::{
+	material::*,
+	pipeline::*
+};
 
+pub mod material;
 pub mod camera;
 pub mod geometry;
 pub mod pipeline;
@@ -85,22 +91,22 @@ impl RenderingBackend {
 			if texture == "Texture" {
 				panic!("you can't use name `Texture` for your texture. This name is reserved for the texture that will be drawn with that material");
 			}
-			// if texture == "_ScreenTexture" {
-			//     panic!(
-			//         "you can't use name `_ScreenTexture` for your texture in shaders. This name is reserved for screen texture"
-			//     );
-			// }
 			shader_meta.images.push(texture.clone());
 		}
-
-		// let source = match shader {
-		//     ShaderSource::Glsl { fragment, .. } => fragment,
-		//     ShaderSource::Msl { program } => program,
-		// };
-		// let wants_screen_texture = source.find("_ScreenTexture").is_some();
 		let shader = self.backend.new_shader(shader, shader_meta)?;
 
 		Ok(self.pipelines.make_pipeline(&mut *self.backend, shader, params, uniforms, textures))
+	}
+
+	pub fn request_material(&mut self, shader: ShaderSource, params: MaterialParams) -> Result<Material, ShaderError> {
+		match self.make_pipeline(shader, params.pipeline_params, params.uniforms, params.textures) {
+			Ok(pipeline) => Ok(Material { pipeline }),
+			Err(err) => Err(err)
+		}
+	}
+
+	pub fn remove_material(&mut self, material: Material) {
+		self.delete_pipeline(material.pipeline);
 	}
 
 	pub fn clear(&mut self, color: Rgba) {
@@ -140,12 +146,13 @@ impl RenderingBackend {
 			let bindings = Bindings {
 				vertex_buffers: vec![vertex_buffer],
 				index_buffer,
-				images: vec![white_texture, white_texture],
+				images: vec![white_texture],
 			};
 
 			self.draw_call_bindings.push(bindings);
 		}
 		assert_eq!(self.draw_call_bindings.len(), self.draw_calls.len());
+		dbg!(self.draw_calls.len());
 
 		let (screen_width, screen_height) = miniquad::window::screen_size();
 		let time = (miniquad::date::now() - self.start_time) as f32;
@@ -162,10 +169,6 @@ impl RenderingBackend {
 				(screen_width as u32, screen_height as u32)
 			};
 
-			// if pipeline.wants_screen_texture {
-			//     self.state.snapshotter.snapshot(self.backend, dc.render_pass);
-			// }
-
 			if let Some(render_pass) = dc.render_pass {
 				self.backend.begin_pass(Some(render_pass), PassAction::Nothing);
 			} else {
@@ -176,17 +179,11 @@ impl RenderingBackend {
 			self.backend.buffer_update(bindings.index_buffer, BufferSource::slice(dc.indices()));
 
 			bindings.images[0] = dc.texture.unwrap_or(white_texture);
-			// bindings.images[1] = self
-			//     .state
-			//     .snapshotter
-			//     .screen_texture
-			//     .unwrap_or_else(|| white_texture);
-			// TODO: Explore the implications of the snapshotter and this part of code, this can possibly create stupid bugs
-			bindings.images.resize(2 + pipeline.textures.len(), white_texture);
+			bindings.images.resize(1 + pipeline.textures.len(), white_texture);
 
 			for (pos, name) in pipeline.textures.iter().enumerate() {
 				if let Some(texture) = pipeline.textures_data.get(name).copied() {
-					bindings.images[2 + pos] = texture;
+					bindings.images[1 + pos] = texture;
 				}
 			}
 
@@ -377,6 +374,10 @@ impl RenderingBackend {
 		self.pipelines.get_pipeline_mut(pipeline).set_uniform(name, uniform);
 	}
 
+	pub fn material_set_uniform<T>(&mut self, material: &Material, name: &str, uniform: T) {
+		self.set_uniform(material.pipeline, name, uniform);
+	}
+
 	pub fn set_texture(&mut self, pipeline: GlPipeline, name: &str, texture: TextureId) {
 		let pipeline = self.pipelines.get_pipeline_mut(pipeline);
 		pipeline
@@ -387,12 +388,16 @@ impl RenderingBackend {
 		*pipeline.textures_data.entry(name.to_owned()).or_insert(texture) = texture;
 	}
 
+	pub fn material_set_texture(&mut self, material: &Material, name: &str, texture: TextureId) {
+		self.set_texture(material.pipeline, name, texture);
+	}
+
 	pub fn update_drawcall_capacity(&mut self, max_vertices: usize, max_indices: usize) {
 		self.max_vertices = max_vertices;
 		self.max_indices = max_indices;
 
 		for draw_call in &mut self.draw_calls {
-			draw_call.vertices = vec![Vertex::new(vec3(0.0, 0.0, 0.0), vec2(0.0, 0.0), rgba::rgba(0, 0, 0, 0)); max_vertices];
+			draw_call.vertices = vec![Vertex::new(vec3(0.0, 0.0, 0.0), vec2(0.0, 0.0)); max_vertices];
 			draw_call.indices = vec![0; max_indices];
 		}
 		for binding in &mut self.draw_call_bindings {
@@ -401,7 +406,7 @@ impl RenderingBackend {
 			*binding = Bindings {
 				vertex_buffers: vec![vertex_buffer],
 				index_buffer,
-				images: vec![self.white_texture, self.white_texture],
+				images: vec![self.white_texture],
 			};
 		}
 	}
@@ -427,8 +432,12 @@ impl bevy_app::Plugin for RenderBackendPlugin {
 	}
 }
 
-fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: Res<ClearColor>, current_camera: Res<camera::CurrentCameraTag>, render_target: Query<&camera::RenderTarget>) {
-	// Begin the render pass
+fn apply_clear_color(
+	mut render_ctx: NonSendMut<RenderingBackend>, 
+	clear_color: Res<ClearColor>, 
+	current_camera: Res<camera::CurrentCameraTag>, 
+	render_target: Query<&camera::RenderTarget>,
+) {
 	let color = clear_color.as_ref().0.to_float();
 	let clear = PassAction::clear_color(color.x, color.y, color.z, color.w);
 	let entity = current_camera.as_ref().0;
