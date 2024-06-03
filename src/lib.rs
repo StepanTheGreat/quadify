@@ -16,7 +16,9 @@ pub mod color {
 pub(crate) mod io;
 pub(crate) mod render;
 pub(crate) mod window;
+pub(crate) mod asset;
 
+use asset::AssetPlugin;
 use bevy_input::InputPlugin;
 // Create Default plugin bundle
 use bevy_app::{PluginGroup, PluginGroupBuilder};
@@ -30,7 +32,8 @@ impl PluginGroup for QuadifyPlugins {
 		let mut builder = PluginGroupBuilder::start::<Self>()
 			.add(InputPlugin)
 			.add(render::RenderBackendPlugin)
-			.add(window::WindowPlugin::default());
+			.add(window::WindowPlugin::default())
+			.add(AssetPlugin);
 
 		#[cfg(feature = "log")]
 		{
