@@ -25,13 +25,12 @@ use bevy_app::{PluginGroup, PluginGroupBuilder};
 
 /// [`QuadifyPlugins`] is a custom made [`DefaultPlugins`](https://docs.rs/bevy/latest/bevy/struct.DefaultPlugins.html) bundle, built on top of miniquad
 pub struct QuadifyPlugins;
-
 impl PluginGroup for QuadifyPlugins {
 	fn build(self) -> PluginGroupBuilder {
 		#[allow(unused_mut)]
 		let mut builder = PluginGroupBuilder::start::<Self>()
 			.add(InputPlugin)
-			.add(render::RenderBackendPlugin)
+			.add(render::RenderBackendPlugin::default())
 			.add(window::WindowPlugin::default())
 			.add(AssetPlugin);
 

@@ -415,17 +415,31 @@ impl RenderingBackend {
 pub struct ClearColor(pub rgba::Rgba);
 
 /// Plugin responsible for initializing the [`RenderBackend`](MqdRenderingBackend)
-pub(crate) struct RenderBackendPlugin;
+pub struct RenderBackendPlugin {
+	/// Controls whether to turn on Quadify's default rendering like Mesh, Materials etc.
+	///
+	/// Some games would like some freedom, so you're free to use the NonSend [`RenderingBackend`] instead.
+	pub default_pipeline: bool,
+}
+
+impl Default for RenderBackendPlugin {
+	fn default() -> Self {
+		Self { default_pipeline: true }
+	}
+}
+
 impl bevy_app::Plugin for RenderBackendPlugin {
 	fn build(&self, app: &mut bevy_app::App) {
-		// Setup default camera
-		let camera = camera::Camera2D::default();
-		let id = app.world.spawn((camera, camera::RenderTarget::Window)).id();
-		// Setup the rendering backend
-		app.insert_resource(camera::CurrentCameraTag(id))
-			.init_resource::<ClearColor>()
-			.add_systems(state::MiniquadPrepareDraw, apply_clear_color)
-			.add_systems(state::MiniquadEndDraw, commit_frame);
+		if self.default_pipeline {
+			// Setup default camera
+			let camera = camera::Camera2D::default();
+			let id = app.world.spawn((camera, camera::RenderTarget::Window)).id();
+			// Setup the rendering backend
+			app.insert_resource(camera::CurrentCameraTag(id))
+				.init_resource::<ClearColor>()
+				.add_systems(state::MiniquadPrepareDraw, apply_clear_color)
+				.add_systems(state::MiniquadEndDraw, commit_frame);
+		}
 	}
 }
 
