@@ -2,8 +2,9 @@ use super::{geometry::Vertex, rgba::rgba};
 use glam::{vec2, vec3};
 use miniquad::*;
 use std::collections::BTreeMap;
+use bevy_reflect::Reflect;
 
-#[derive(Debug, Clone, Copy, PartialEq)]
+#[derive(Reflect, Debug, Clone, Copy, PartialEq)]
 pub struct GlPipeline(usize);
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -51,7 +52,7 @@ impl DrawCall {
 		max_indices: usize,
 	) -> DrawCall {
 		DrawCall {
-			vertices: vec![Vertex::new(vec3(0., 0., 0.), vec2(0., 0.), rgba(0, 0, 0, 0)); max_vertices],
+			vertices: vec![Vertex::new(vec3(0., 0., 0.), vec2(0., 0.)); max_vertices],
 			indices: vec![0; max_indices],
 			vertices_count: 0,
 			indices_count: 0,
@@ -306,13 +307,13 @@ impl PipelineStorage {
 	}
 }
 
+// TODO: Make Color part of uniform in shaders
 pub(crate) mod shader {
 	use miniquad::{ShaderMeta, UniformBlockLayout, UniformDesc, UniformType};
 
 	pub const VERTEX: &str = r#"#version 100
 	attribute vec3 position;
 	attribute vec2 texcoord;
-	attribute vec4 color0;
 
 	varying lowp vec2 uv;
 	varying lowp vec4 color;
@@ -322,7 +323,7 @@ pub(crate) mod shader {
 
 	void main() {
 		 gl_Position = Projection * Model * vec4(position, 1);
-		 color = color0 / 255.0;
+		 color = vec4(1.0, 0.0, 0.0, 1.0);
 		 uv = texcoord;
 	}"#;
 
@@ -349,7 +350,6 @@ pub(crate) mod shader {
 	{
 		 float3 position    [[attribute(0)]];
 		 float2 texcoord    [[attribute(1)]];
-		 float4 color0      [[attribute(2)]];
 	};
 
 	struct RasterizerData
@@ -364,7 +364,7 @@ pub(crate) mod shader {
 		 RasterizerData out;
 
 		 out.position = uniforms.Model * uniforms.Projection * float4(v.position, 1);
-		 out.color = v.color0 / 255.0;
+		 out.color = float4(1.0, 0.0, 0.0, 1.0);
 		 out.uv = v.texcoord;
 
 		 return out;
@@ -382,7 +382,7 @@ pub(crate) mod shader {
 
 	pub fn meta() -> ShaderMeta {
 		ShaderMeta {
-			images: vec!["Texture".to_string(), "_ScreenTexture".to_string()],
+			images: vec!["Texture".to_string()],
 			uniforms: UniformBlockLayout {
 				uniforms: uniforms().into_iter().map(|(name, kind)| UniformDesc::new(name, kind)).collect(),
 			},
