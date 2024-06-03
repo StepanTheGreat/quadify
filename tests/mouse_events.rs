@@ -8,7 +8,6 @@ const INPUT_NEEDED: u32 = 4;
 #[derive(Resource)]
 struct InputReceived(u32);
 
-
 //TODO: Add mouse position, mouse wheel resource check,
 
 #[test]

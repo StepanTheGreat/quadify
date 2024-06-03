@@ -13,10 +13,10 @@ pub mod color {
 	pub use crate::render::rgba::*;
 }
 
+pub(crate) mod asset;
 pub(crate) mod io;
 pub(crate) mod render;
 pub(crate) mod window;
-pub(crate) mod asset;
 
 use asset::AssetPlugin;
 use bevy_input::InputPlugin;

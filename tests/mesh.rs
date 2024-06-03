@@ -4,11 +4,11 @@ use bevy_app::prelude::*;
 use bevy_asset::{Assets, Handle};
 use bevy_ecs::prelude::*;
 use bevy_input::mouse::MouseButtonInput;
+use glam::Mat4;
 use quadify::prelude::geometry::{Mesh, MeshBuilder};
 use quadify::prelude::RenderingBackend;
 use quadify::prelude::WindowPlugin;
 use quadify::{color, prelude::*};
-use glam::Mat4;
 
 #[derive(Resource)]
 struct MeshHandle {
@@ -33,41 +33,23 @@ fn main() {
 		.run();
 }
 
-fn setup_render_state(
-	mut commands: Commands,
-	mut meshes: ResMut<Assets<Mesh>>
-) {
+fn setup_render_state(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>) {
 	commands.insert_resource(MeshHandle {
-		mesh: meshes.add(MeshBuilder::new()
-			.as_circle(0.2)
-			.circle_points(3)
-			.build()),
+		mesh: meshes.add(MeshBuilder::new().as_circle(0.2).circle_points(3).build()),
 		parts_count: 3,
 	});
 }
 
-fn change_on_click(
-	mut mesh: ResMut<MeshHandle>, 
-	mut click: EventReader<MouseButtonInput>,
-	mut meshes: ResMut<Assets<Mesh>>
-) {
+fn change_on_click(mut mesh: ResMut<MeshHandle>, mut click: EventReader<MouseButtonInput>, mut meshes: ResMut<Assets<Mesh>>) {
 	for event in click.read() {
 		if event.state.is_pressed() {
 			mesh.parts_count = ((mesh.parts_count + 1) % 64).max(4);
-			meshes.insert(&mesh.mesh, MeshBuilder::new()
-				.as_circle(0.2)
-				.circle_points(mesh.parts_count)
-				.build());
+			meshes.insert(&mesh.mesh, MeshBuilder::new().as_circle(0.2).circle_points(mesh.parts_count).build());
 		}
 	}
 }
 
-fn draw_circle(
-	mesh: Res<MeshHandle>, 
-	mut render_ctx: NonSendMut<RenderingBackend>,
-	meshes: Res<Assets<Mesh>>
-) {
-
+fn draw_circle(mesh: Res<MeshHandle>, mut render_ctx: NonSendMut<RenderingBackend>, meshes: Res<Assets<Mesh>>) {
 	if let Some(mesh) = meshes.get(&mesh.mesh) {
 		let (verts, inds) = (&mesh.vertices, &mesh.indices);
 		render_ctx.clear(color::rgba(0, 0, 0, 0));

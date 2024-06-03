@@ -1,8 +1,8 @@
 use super::{geometry::Vertex, rgba::rgba};
+use bevy_reflect::Reflect;
 use glam::{vec2, vec3};
 use miniquad::*;
 use std::collections::BTreeMap;
-use bevy_reflect::Reflect;
 
 #[derive(Reflect, Debug, Clone, Copy, PartialEq)]
 pub struct GlPipeline(usize);

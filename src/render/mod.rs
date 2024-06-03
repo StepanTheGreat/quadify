@@ -9,14 +9,11 @@ use self::material::Material;
 use self::rgba::Rgba;
 use crate::window::state;
 
-use super::render::{
-	material::*,
-	pipeline::*
-};
+use super::render::{material::*, pipeline::*};
 
-pub mod material;
 pub mod camera;
 pub mod geometry;
+pub mod material;
 pub mod pipeline;
 pub mod rgba;
 
@@ -101,7 +98,7 @@ impl RenderingBackend {
 	pub fn request_material(&mut self, shader: ShaderSource, params: MaterialParams) -> Result<Material, ShaderError> {
 		match self.make_pipeline(shader, params.pipeline_params, params.uniforms, params.textures) {
 			Ok(pipeline) => Ok(Material { pipeline }),
-			Err(err) => Err(err)
+			Err(err) => Err(err),
 		}
 	}
 
@@ -432,12 +429,7 @@ impl bevy_app::Plugin for RenderBackendPlugin {
 	}
 }
 
-fn apply_clear_color(
-	mut render_ctx: NonSendMut<RenderingBackend>, 
-	clear_color: Res<ClearColor>, 
-	current_camera: Res<camera::CurrentCameraTag>, 
-	render_target: Query<&camera::RenderTarget>,
-) {
+fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: Res<ClearColor>, current_camera: Res<camera::CurrentCameraTag>, render_target: Query<&camera::RenderTarget>) {
 	let color = clear_color.as_ref().0.to_float();
 	let clear = PassAction::clear_color(color.x, color.y, color.z, color.w);
 	let entity = current_camera.as_ref().0;
