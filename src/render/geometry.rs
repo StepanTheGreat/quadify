@@ -1,8 +1,6 @@
 use std::f32::consts::PI;
 
-use super::rgba::Rgba;
 use bevy_asset::Asset;
-use bevy_ecs::component::Component;
 use bevy_reflect::Reflect;
 use glam::{vec2, vec3, Vec2, Vec3};
 use miniquad::{VertexAttribute, VertexFormat};
@@ -47,7 +45,7 @@ impl Mesh {
 
 	/// Makes a circle mesh, with a specified amount of points
 	fn circle(npoints: u32, r: f32) -> Self {
-		assert!(npoints >= 3, "Not enough points to represent a circle mesh. Minimum is 3");
+		debug_assert!(npoints >= 3, "Not enough points to represent a circle mesh. Minimum is 3");
 		let mut indices: Vec<u16> = vec![];
 		let mut vertices: Vec<Vertex> = vec![];
 
@@ -78,11 +76,13 @@ pub struct MeshBuilder {
 	circle_points: u32,
 }
 
-impl MeshBuilder {
-	pub fn new() -> Self {
+impl Default for MeshBuilder {
+	fn default() -> Self {
 		Self { shape: None, circle_points: 20 }
 	}
+}
 
+impl MeshBuilder {
 	/// Generates a quad mesh, with a specified size
 	pub fn as_quad(&mut self, size: Vec2) -> &mut Self {
 		self.shape = Some(MeshShape::Quad(size));
@@ -100,7 +100,7 @@ impl MeshBuilder {
 
 	/// Sets circle's point amount. The default value is `20`, but you can increase/reduce this number to a desired result.
 	pub fn circle_points(&mut self, n_points: u32) -> &mut Self {
-		assert!(n_points >= 3, "Not enough points to represent a circle mesh. Minimum is 3");
+		debug_assert!(n_points >= 3, "Not enough points to represent a circle mesh. Minimum is 3");
 		self.circle_points = n_points;
 		self
 	}
@@ -109,8 +109,8 @@ impl MeshBuilder {
 	///
 	/// *Note: panics if the shape wasn't provided*
 	pub fn build(&mut self) -> Mesh {
-		assert!(self.shape.is_some(), "Can't build a Mesh without shape parameter provided.");
-		// Should unwrap thanks to the previous `assert`
+		debug_assert!(self.shape.is_some(), "Can't build a Mesh without shape parameter provided.");
+		// Should unwrap thanks to the previous `debug_assert`
 		match self.shape.take().unwrap() {
 			MeshShape::Quad(size) => Mesh::quad(size),
 			MeshShape::Circle(r) => Mesh::circle(self.circle_points, r),

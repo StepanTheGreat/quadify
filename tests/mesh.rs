@@ -49,10 +49,10 @@ fn change_on_click(mut mesh: ResMut<MeshHandle>, mut click: EventReader<MouseBut
 	}
 }
 
-fn draw_circle(mesh: Res<MeshHandle>, mut render_ctx: NonSendMut<RenderingBackend>, meshes: Res<Assets<Mesh>>) {
+fn draw_circle(mesh: Res<MeshHandle>, mut render_ctx: NonSendMut<RenderingBackend>, meshes: Res<Assets<Mesh>>, clear_colour: Res<ClearColor>) {
 	if let Some(mesh) = meshes.get(&mesh.mesh) {
 		let (verts, inds) = (&mesh.vertices, &mesh.indices);
-		render_ctx.clear(color::rgba(0, 0, 0, 0));
+		render_ctx.clear(clear_colour.0);
 		render_ctx.texture(None);
 		render_ctx.draw_mode(pipeline::DrawMode::Triangles);
 		render_ctx.geometry(&verts[..], &inds[..]);

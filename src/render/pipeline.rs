@@ -1,4 +1,4 @@
-use super::{geometry::Vertex, rgba::rgba};
+use super::geometry::Vertex;
 use bevy_reflect::Reflect;
 use glam::{vec2, vec3};
 use miniquad::*;

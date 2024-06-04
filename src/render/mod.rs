@@ -1,10 +1,9 @@
-use bevy_asset::Handle;
 use bevy_ecs::system::{NonSendMut, Query, Res, Resource};
 use glam::{vec2, vec3};
 use miniquad::*;
 use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 
-use self::geometry::{Mesh, Vertex};
+use self::geometry::Vertex;
 use self::material::Material;
 use self::rgba::Rgba;
 use crate::window::state;
@@ -23,7 +22,6 @@ pub struct RenderingBackend {
 	start_time: f64,
 
 	white_texture: miniquad::TextureId,
-	red_texture: miniquad::TextureId,
 
 	pipelines: pipeline::PipelineStorage,
 	max_vertices: usize,
@@ -55,8 +53,6 @@ impl RenderingBackend {
 		let mut backend = window::new_rendering_backend();
 
 		let white_texture = backend.new_texture_from_rgba8(1, 1, &[255, 255, 255, 255]);
-		let red_texture = backend.new_texture_from_rgba8(1, 1, &[255, 0, 0, 255]);
-
 		let pipelines = pipeline::PipelineStorage::new(&mut *backend);
 
 		Self {
@@ -64,7 +60,6 @@ impl RenderingBackend {
 			start_time: miniquad::date::now(),
 
 			white_texture,
-			red_texture,
 
 			pipelines,
 			max_vertices: 10000,
@@ -453,9 +448,9 @@ fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: 
 			camera::RenderTarget::Window => render_ctx.begin_default_pass(clear),
 			camera::RenderTarget::Texture { render_pass, .. } => render_ctx.begin_pass(Some(render_pass.clone()), clear),
 		},
-		Err(e) => {
+		Err(_e) => {
 			#[cfg(feature = "log")]
-			bevy_log::error!("Failed to get render target: {:?} on current Camera: {:?}", e, entity);
+			bevy_log::error!("Failed to get render target: {:?} on current Camera: {:?}", _e, entity);
 			return;
 		}
 	};
