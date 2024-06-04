@@ -1,10 +1,6 @@
 use bevy_app::*;
-use bevy_ecs::change_detection::DetectChangesMut;
-use bevy_ecs::entity::Entity;
-use bevy_ecs::{schedule::ScheduleLabel, system::Resource};
-use bevy_input::keyboard::NativeKeyCode;
-use bevy_input::mouse::MouseScrollUnit;
-use bevy_input::{prelude::*, ButtonState};
+use bevy_ecs::{change_detection::DetectChangesMut, entity::Entity, schedule::ScheduleLabel, system::Resource};
+use bevy_input::{keyboard::NativeKeyCode, mouse::MouseScrollUnit, prelude::*, ButtonState};
 use glam::{vec2, Vec2};
 use miniquad::{window, EventHandler};
 
