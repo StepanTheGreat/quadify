@@ -16,7 +16,7 @@ fn main() {
 			resizeable: false,
 			..Default::default()
 		}))
-		.add_plugins(bevy_time::TimePlugin::default())
+		.add_plugins(bevy_time::TimePlugin)
 		.add_systems(Startup, || {
 			println!("User needs to attempt Quitting the application twice to exit.");
 		})

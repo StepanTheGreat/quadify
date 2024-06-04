@@ -41,14 +41,15 @@ impl Default for WindowPlugin {
 
 impl Plugin for WindowPlugin {
 	fn build(&self, app: &mut App) {
-		let mut conf = Conf::default();
-
-		conf.window_title = self.title.clone();
-		conf.window_width = self.width;
-		conf.window_height = self.height;
-		conf.fullscreen = self.fullscreen;
-		conf.high_dpi = self.high_dpi;
-		conf.window_resizable = self.resizeable;
+		let mut conf = Conf {
+			window_title: self.title.clone(),
+			window_width: self.width,
+			window_height: self.height,
+			fullscreen: self.fullscreen,
+			high_dpi: self.high_dpi,
+			window_resizable: self.resizeable,
+			..Default::default()
+		};
 
 		if let Some(icon) = &self.icon {
 			conf.icon = icon.try_into().ok();
@@ -64,8 +65,8 @@ impl Plugin for WindowPlugin {
 			window: window_entity,
 
 			position: None,
-			width: self.width as u32,
-			height: self.height as u32,
+			width: self.width,
+			height: self.height,
 			fullscreen: self.fullscreen,
 
 			cursor_grabbed: false,
