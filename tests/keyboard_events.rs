@@ -21,7 +21,7 @@ fn main() {
 
 fn keyboard_events(mut events: EventReader<KeyboardInput>, mut window_properties: ResMut<WindowProperties>) {
 	for event in events.read() {
-		if kdown = event.state.is_pressed() {
+		if let kdown = event.state.is_pressed() {
 			match event.key_code {
 				KeyCode::KeyF => {
 					window_properties.fullscreen = !window_properties.fullscreen;
