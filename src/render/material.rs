@@ -1,11 +1,15 @@
-use super::Rgba;
+use super::{RenderingBackend, Rgba};
 use bevy_asset::Asset;
 use bevy_reflect::Reflect;
 use miniquad::*;
 
 use crate::render::GlPipeline;
 
-/// Material instance loaded on GPU.
+/// Material instance loaded on GPU. 
+/// 
+/// Please use the [`RenderingBackend`] non-send resource to modify its data:
+/// - [`material_set_uniform`](RenderingBackend::material_set_uniform)
+/// - [`material_set_texture`](RenderingBackend::material_set_texture)
 #[derive(Asset, Clone, PartialEq, Reflect)]
 pub struct Material {
 	pub(crate) pipeline: GlPipeline,
