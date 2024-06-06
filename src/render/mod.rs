@@ -209,10 +209,6 @@ impl RenderingBackend {
 			self.backend.draw(0, dc.indices_count as i32, 1);
 			self.backend.end_render_pass();
 
-			// if dc.capture {
-			//     telemetry::track_drawcall(&pipeline.pipeline, bindings, dc.indices_count);
-			// }
-
 			dc.vertices_count = 0;
 			dc.indices_count = 0;
 		}
@@ -371,6 +367,10 @@ impl RenderingBackend {
 		self.pipelines.get_pipeline_mut(pipeline).set_uniform(name, uniform);
 	}
 
+	pub fn set_material(&mut self, material: &Material) {
+		self.pipeline(Some(material.pipeline));
+	}
+
 	pub fn material_set_uniform<T>(&mut self, material: &Material, name: &str, uniform: T) {
 		self.set_uniform(material.pipeline, name, uniform);
 	}
@@ -443,7 +443,13 @@ impl bevy_app::Plugin for RenderBackendPlugin {
 	}
 }
 
-fn apply_clear_color(mut render_ctx: NonSendMut<RenderingBackend>, clear_color: Res<ClearColor>, current_camera: Res<camera::CurrentCameraTag>, render_target: Query<&camera::RenderTarget>) {
+fn apply_clear_color(
+	mut render_ctx: NonSendMut<RenderingBackend>, 
+	clear_color: Res<ClearColor>, 
+	current_camera: Res<camera::CurrentCameraTag>, 
+	render_target: Query<&camera::RenderTarget>,
+	// renderables: Query<&Handle<Mesh>>
+) {
 	let color = clear_color.as_ref().0.to_float();
 	let clear = PassAction::clear_color(color.x, color.y, color.z, color.w);
 	let entity = current_camera.as_ref().0;
