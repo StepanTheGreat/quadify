@@ -1,18 +1,31 @@
-use std::sync::OnceLock;
-
 use bevy_app::Plugin;
-use bevy_asset::AssetPlugin as BevyAssetPlugin;
+use bevy_asset::{AssetLoader, AssetPlugin as BevyAssetPlugin};
 use bevy_asset::{Asset, AssetApp, Assets};
 use bevy_reflect::Reflect;
-use miniquad::TextureId;
+use miniquad::{TextureId, ShaderSource, ShaderMeta};
 
 use crate::prelude::material::Material;
 use crate::prelude::Mesh;
 
+mod io;
+
+pub use io::*;
+
+// ? I'm using Option here to workaround rendering types not implementing Default trait. If there's a better way
+// ? of course - it would be great!
+
 #[derive(Asset, Clone, PartialEq, Reflect)]
 pub struct Texture {
 	#[reflect(ignore)]
-	texture: OnceLock<TextureId>,
+	texture: Option<TextureId>,
+}
+
+impl Texture {
+	pub fn new(texture: TextureId) -> Self {
+		Self {
+			texture: Some(texture)
+		}
+	}
 }
 
 pub struct AssetPlugin;
