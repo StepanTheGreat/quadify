@@ -37,41 +37,33 @@ fn close_when_received_all(received: Res<InputReceived>, mut quit_events: EventW
 }
 
 fn mouse_btn_events(mbtn_events: EventReader<MouseButtonInput>, mut received: ResMut<InputReceived>, mut is_done: Local<bool>) {
-	if !*is_done {
-		if !mbtn_events.is_empty() {
-			*is_done = true;
-			received.0 += 1;
-			println!("1: Mouse button event received!");
-		}
-	}
+	if !*is_done && !mbtn_events.is_empty() {
+ 			*is_done = true;
+ 			received.0 += 1;
+ 			println!("1: Mouse button event received!");
+ 		}
 }
 
 fn mouse_motion_events(mmotion_events: EventReader<MouseMotion>, mut received: ResMut<InputReceived>, mut is_done: Local<bool>) {
-	if !*is_done {
-		if !mmotion_events.is_empty() {
-			*is_done = true;
-			received.0 += 1;
-			println!("2: Mouse motion event received!");
-		}
-	}
+	if !*is_done && !mmotion_events.is_empty() {
+ 			*is_done = true;
+ 			received.0 += 1;
+ 			println!("2: Mouse motion event received!");
+ 		}
 }
 
 fn mouse_scroll_events(mscroll_events: EventReader<MouseWheel>, mut received: ResMut<InputReceived>, mut is_done: Local<bool>) {
-	if !*is_done {
-		if !mscroll_events.is_empty() {
-			*is_done = true;
-			received.0 += 1;
-			println!("3: Mouse wheel event received!");
-		}
-	}
+	if !*is_done && !mscroll_events.is_empty() {
+ 			*is_done = true;
+ 			received.0 += 1;
+ 			println!("3: Mouse wheel event received!");
+ 		}
 }
 
 fn mouse_button(mbtn: Res<ButtonInput<MouseButton>>, mut received: ResMut<InputReceived>, mut is_done: Local<bool>) {
-	if !*is_done {
-		if mbtn.pressed(MouseButton::Left) {
-			*is_done = true;
-			received.0 += 1;
-			println!("4: Mouse button resource works!");
-		}
-	}
+	if !*is_done && mbtn.pressed(MouseButton::Left) {
+ 			*is_done = true;
+ 			received.0 += 1;
+ 			println!("4: Mouse button resource works!");
+ 		}
 }

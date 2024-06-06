@@ -21,7 +21,7 @@ fn main() {
 
 			App::new()
 				.add_plugins(QuadifyPlugins.set(window))
-				.add_plugins(bevy_time::TimePlugin::default())
+				.add_plugins(bevy_time::TimePlugin)
 				.add_systems(Startup, set_clear_colour)
 				.add_systems(Update, read_events)
 				.run();

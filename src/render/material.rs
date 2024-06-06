@@ -30,7 +30,7 @@ pub struct MaterialParams {
 }
 
 #[derive(Debug)]
-pub struct DefaultMateralParams {
+pub struct DefaultMaterailParams {
 	color: Rgba,
 	texture: Option<TextureId>,
 }

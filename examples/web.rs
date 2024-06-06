@@ -47,7 +47,7 @@ fn read_keyboard(mut keyboard_events: EventReader<KeyboardInput>, mut window_pro
 
 fn file_drop_events(mut events: EventReader<DroppedFileEvent>) {
 	for event in events.read() {
-		let _string = event.bytes.as_ref().map(|d| String::from_utf8_lossy(&d));
+		let _string = event.bytes.as_ref().map(|d| String::from_utf8_lossy(d));
 		#[cfg(feature = "log")]
 		bevy_log::info!("File {:?} Dropped into Application: {:?}", event.path, _string);
 	}

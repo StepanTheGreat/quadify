@@ -1,10 +1,9 @@
-use bevy_asset::Handle;
 use bevy_ecs::system::{NonSendMut, Query, Res, Resource};
 use glam::{vec2, vec3};
 use miniquad::*;
 use miniquad::{window, PassAction, RenderingBackend as MqdRenderingBackend};
 
-use self::geometry::{Mesh, Vertex};
+use self::geometry::Vertex;
 use self::material::Material;
 use self::rgba::Rgba;
 use crate::window::state;
@@ -23,7 +22,6 @@ pub struct RenderingBackend {
 	start_time: f64,
 
 	white_texture: miniquad::TextureId,
-	red_texture: miniquad::TextureId,
 
 	pipelines: pipeline::PipelineStorage,
 	max_vertices: usize,
@@ -50,13 +48,17 @@ impl std::ops::DerefMut for RenderingBackend {
 	}
 }
 
+impl Default for RenderingBackend {
+	fn default() -> Self {
+		Self::new()
+	}
+}
+
 impl RenderingBackend {
 	pub fn new() -> Self {
 		let mut backend = window::new_rendering_backend();
 
 		let white_texture = backend.new_texture_from_rgba8(1, 1, &[255, 255, 255, 255]);
-		let red_texture = backend.new_texture_from_rgba8(1, 1, &[255, 0, 0, 255]);
-
 		let pipelines = pipeline::PipelineStorage::new(&mut *backend);
 
 		Self {
@@ -64,7 +66,6 @@ impl RenderingBackend {
 			start_time: miniquad::date::now(),
 
 			white_texture,
-			red_texture,
 
 			pipelines,
 			max_vertices: 10000,
@@ -163,7 +164,7 @@ impl RenderingBackend {
 				let (width, height) = self.backend.texture_size(render_texture);
 				(width, height)
 			} else {
-				(screen_width as u32, screen_height as u32)
+				(screen_width, screen_height)
 			};
 
 			if let Some(render_pass) = dc.render_pass {
@@ -245,10 +246,7 @@ impl RenderingBackend {
 	}
 
 	pub fn texture(&mut self, texture: Option<&TextureId>) {
-		self.state.texture = match texture {
-			None => None,
-			Some(t) => Some(t.clone()),
-		};
+		self.state.texture = texture.copied();
 		// ! I'm cloning here because from the macroquad code, it converts Texture2D's id to an owned type (thus cloning it anyway)
 	}
 
@@ -315,11 +313,11 @@ impl RenderingBackend {
 				|| draw_call.capture != self.state.capture
 				|| self.state.break_batching
 		}) {
-			let uniforms = self.state.pipeline.map_or(None, |pipeline| Some(self.pipelines.get_pipeline_mut(pipeline).uniforms_data.clone()));
+			let uniforms = self.state.pipeline.map(|pipeline| self.pipelines.get_pipeline_mut(pipeline).uniforms_data.clone());
 
 			if self.draw_calls_count >= self.draw_calls.len() {
 				self.draw_calls.push(DrawCall::new(
-					self.state.texture.clone(),
+					self.state.texture,
 					self.state.model(),
 					self.state.draw_mode,
 					pip,
@@ -329,7 +327,7 @@ impl RenderingBackend {
 					self.max_indices,
 				));
 			}
-			self.draw_calls[self.draw_calls_count].texture = self.state.texture.clone();
+			self.draw_calls[self.draw_calls_count].texture = self.state.texture;
 			self.draw_calls[self.draw_calls_count].uniforms = uniforms;
 			self.draw_calls[self.draw_calls_count].vertices_count = 0;
 			self.draw_calls[self.draw_calls_count].indices_count = 0;
@@ -346,7 +344,7 @@ impl RenderingBackend {
 		let dc = &mut self.draw_calls[self.draw_calls_count - 1];
 
 		for i in 0..vertices.len() {
-			dc.vertices[dc.vertices_count + i] = vertices[i].into();
+			dc.vertices[dc.vertices_count + i] = vertices[i];
 		}
 
 		for i in 0..indices.len() {
@@ -354,7 +352,7 @@ impl RenderingBackend {
 		}
 		dc.vertices_count += vertices.len();
 		dc.indices_count += indices.len();
-		dc.texture = self.state.texture.clone();
+		dc.texture = self.state.texture;
 	}
 
 	pub fn delete_pipeline(&mut self, pipeline: GlPipeline) {
@@ -457,11 +455,11 @@ fn apply_clear_color(
 	match render_target.get(entity) {
 		Ok(rt) => match rt {
 			camera::RenderTarget::Window => render_ctx.begin_default_pass(clear),
-			camera::RenderTarget::Texture { render_pass, .. } => render_ctx.begin_pass(Some(render_pass.clone()), clear),
+			camera::RenderTarget::Texture { render_pass, .. } => render_ctx.begin_pass(Some(*render_pass), clear),
 		},
-		Err(e) => {
+		Err(_e) => {
 			#[cfg(feature = "log")]
-			bevy_log::error!("Failed to get render target: {:?} on current Camera: {:?}", e, entity);
+			bevy_log::error!("Failed to get render target: {:?} on current Camera: {:?}", _e, entity);
 			return;
 		}
 	};
