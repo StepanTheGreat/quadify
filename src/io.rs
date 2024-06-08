@@ -39,3 +39,16 @@ pub async fn load_string(path: &str) -> Result<String, fs::Error> {
 	let data = load_file(path).await?;
 	Ok(String::from_utf8(data).unwrap())
 }
+
+/// Loads a file syncronously and returns a vector of bytes on success. Uses HTTPs on web.
+///
+/// Make sure to use it only on the main thread.
+pub fn load_file_sync(path: impl Into<&'static str>) -> Result<Vec<u8>, miniquad::fs::Error> {
+	let (tx, rx) = oneshot::channel();
+	miniquad::fs::load_file(path.into(), move |data| {
+		tx.send(data).unwrap();
+	});
+
+	// ? Shouldn't panic
+	rx.recv().unwrap()
+}
