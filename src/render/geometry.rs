@@ -2,7 +2,7 @@ use std::f32::consts::PI;
 
 use bevy_asset::Asset;
 use bevy_reflect::Reflect;
-use glam::{vec2, vec3, Vec2, Vec3};
+use glam::{vec2, vec3, Vec2, Vec3, Quat};
 use miniquad::{VertexAttribute, VertexFormat};
 
 use super::rgba::Rgba;
@@ -69,6 +69,49 @@ impl Mesh {
 		}
 		Self { vertices, indices }
 	}
+
+	/// Translates the vertex positions of the mesh by the given [`Vec3`].
+	pub fn translated_by(mut self, translation: Vec3) -> Self {
+        self.translate_by(translation);
+        self
+    }
+
+    /// Translates the vertex positions of the mesh in place by the given [`Vec3`].
+    pub fn translate_by(&mut self, translation: Vec3) {
+        if translation == Vec3::ZERO {
+            return;
+        }
+
+		for vert in self.vertices.iter_mut() {
+			vert.position += translation;
+		}
+    }
+
+	/// Rotates the vertex positions of the mesh by the given [`Quat`].
+    pub fn rotated_by(mut self, rotation: Quat) -> Self {
+        self.rotate_by(rotation);
+        self
+    }
+
+    /// Rotates the vertex positions of the mesh in place by the given [`Quat`].
+    pub fn rotate_by(&mut self, rotation: Quat) {
+		for vert in self.vertices.iter_mut() {
+			vert.position = rotation * vert.position;
+		}
+    }
+
+	/// Scales the vertex positions, normals, and tangents of the mesh by the given [`Vec3`].
+    pub fn scaled_by(mut self, scale: Vec3) -> Self {
+        self.scale_by(scale);
+        self
+    }
+
+    /// Scales the vertex positions, normals, and tangents of the mesh in place by the given [`Vec3`].
+    pub fn scale_by(&mut self, scale: Vec3) {
+		for vert in self.vertices.iter_mut() {
+			vert.position = scale * vert.position;
+		}
+    }
 }
 
 /// A private struct that only stores meshes size.
