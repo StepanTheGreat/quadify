@@ -79,7 +79,7 @@ impl Default for Camera2D {
 }
 
 impl Camera2D {
-	fn matrix(&self) -> Mat4 {
+	pub fn matrix(&self) -> Mat4 {
 		// gleaned from https://github.com/raysan5/raylib/blob/master/src/core.c#L1528
 		let mat_origin_rot_scale = Mat4::from_scale_rotation_translation(
 			Vec3::new(self.zoom.x, self.zoom.y * -1.0, 1.0),
