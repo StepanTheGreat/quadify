@@ -7,8 +7,7 @@ use miniquad::{ShaderMeta, ShaderSource, TextureId};
 use crate::prelude::material::Material;
 use crate::prelude::Mesh;
 
-mod io;
-
+pub mod io;
 pub use io::*;
 
 // ? I'm using Option here to workaround rendering types not implementing Default trait. If there's a better way
@@ -23,6 +22,11 @@ pub struct Texture {
 impl Texture {
 	pub fn new(texture: TextureId) -> Self {
 		Self { texture: Some(texture) }
+	}
+
+	pub fn id(&self) -> TextureId {
+		// This shouldn't panic, since textures are supposed to be always Some
+		self.texture.unwrap()
 	}
 }
 
