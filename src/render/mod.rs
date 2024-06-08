@@ -96,6 +96,7 @@ impl RenderingBackend {
 		Ok(self.pipelines.make_pipeline(&mut *self.backend, shader, params, uniforms, textures))
 	}
 
+	/// Tries to compile shaders and create a pipeline, and on success will return a new [`Material`]
 	pub fn request_material(&mut self, shader: ShaderSource, params: MaterialParams) -> Result<Material, ShaderError> {
 		match self.make_pipeline(shader, params.pipeline_params, params.uniforms, params.textures) {
 			Ok(pipeline) => Ok(Material { pipeline }),
@@ -107,6 +108,7 @@ impl RenderingBackend {
 		self.delete_pipeline(material.pipeline);
 	}
 
+	/// Clears all draw calls and clears the screen with specified color
 	pub fn clear(&mut self, color: Rgba) {
 		let col = color.to_float();
 		let clear = PassAction::clear_color(col.x, col.y, col.z, col.w);
@@ -135,6 +137,7 @@ impl RenderingBackend {
 		self.draw_calls_count = 0;
 	}
 
+	/// Flushes all the draw calls, applying the specified projection as uniform camera.
 	pub fn draw(&mut self, projection: glam::Mat4) {
 		let white_texture = self.white_texture;
 
@@ -217,18 +220,6 @@ impl RenderingBackend {
 		self.draw_calls_count = 0;
 	}
 
-	pub(crate) fn capture(&mut self, capture: bool) {
-		self.state.capture = capture;
-	}
-
-	// pub fn get_projection_matrix(&self) -> glam::Mat4 {
-	//     // get_projection_matrix is a way plugins used to get macroquad's current projection
-	//     // back in the days when projection was a part of static batcher
-	//     // now it is not, so here we go with this hack
-
-	//     crate::get_context().projection_matrix()
-	// }
-
 	pub fn get_active_render_pass(&self) -> Option<RenderPass> {
 		self.state.render_pass
 	}
@@ -245,6 +236,8 @@ impl RenderingBackend {
 		self.state.depth_test_enable = enable;
 	}
 
+	/// Set the draw call texture. It's recommended to set this for every draw call, so the geometry won't merge with the previous draw call.
+	/// (Check the [`RenderingBackend::geometry`] method documentation)
 	pub fn texture(&mut self, texture: Option<&TextureId>) {
 		self.state.texture = texture.copied();
 		// ! I'm cloning here because from the macroquad code, it converts Texture2D's id to an owned type (thus cloning it anyway)
@@ -273,6 +266,7 @@ impl RenderingBackend {
 		}
 	}
 
+	/// Set the draw call pipeline. This will create a new draw call, if previous pipeline is different to the new one.
 	pub fn pipeline(&mut self, pipeline: Option<GlPipeline>) {
 		if self.state.pipeline == pipeline {
 			return;
@@ -282,10 +276,24 @@ impl RenderingBackend {
 		self.state.pipeline = pipeline;
 	}
 
+	/// Set the draw call draw mode (i.e. triangles or lines)
 	pub fn draw_mode(&mut self, mode: DrawMode) {
 		self.state.draw_mode = mode;
 	}
 
+	/// Put verticies and indicies into the draw call geometry. This will **append** geometry to the same draw call
+	/// if some of the parameters didn't change:
+	/// - Clip region
+	/// - Viewport region
+	/// - Model matrix
+	/// - Pipeline
+	/// - Render pass
+	/// - Texture
+	/// - Draw mode
+	/// 
+	/// The new draw call will be allocated, if previous + new geometry exceeds the vertex or indices limit (`10000` and `5000`) 
+	/// 
+	/// You can manually allocate a new draw call by calling [`RenderingBackend::break_batching`]
 	pub fn geometry(&mut self, vertices: &[Vertex], indices: &[u16]) {
 		if vertices.len() >= self.max_vertices || indices.len() >= self.max_indices {
 			#[cfg(feature = "log")]
@@ -310,7 +318,6 @@ impl RenderingBackend {
 				|| draw_call.draw_mode != self.state.draw_mode
 				|| draw_call.vertices_count >= self.max_vertices - vertices.len()
 				|| draw_call.indices_count >= self.max_indices - indices.len()
-				|| draw_call.capture != self.state.capture
 				|| self.state.break_batching
 		}) {
 			let uniforms = self.state.pipeline.map(|pipeline| self.pipelines.get_pipeline_mut(pipeline).uniforms_data.clone());
@@ -336,11 +343,11 @@ impl RenderingBackend {
 			self.draw_calls[self.draw_calls_count].model = self.state.model();
 			self.draw_calls[self.draw_calls_count].pipeline = pip;
 			self.draw_calls[self.draw_calls_count].render_pass = self.state.render_pass;
-			self.draw_calls[self.draw_calls_count].capture = self.state.capture;
 
 			self.draw_calls_count += 1;
 			self.state.break_batching = false;
-		};
+		}
+
 		let dc = &mut self.draw_calls[self.draw_calls_count - 1];
 
 		for i in 0..vertices.len() {
@@ -350,29 +357,37 @@ impl RenderingBackend {
 		for i in 0..indices.len() {
 			dc.indices[dc.indices_count + i] = indices[i] + dc.vertices_count as u16;
 		}
+
 		dc.vertices_count += vertices.len();
 		dc.indices_count += indices.len();
 		dc.texture = self.state.texture;
 	}
 
+	/// Deletes the pipeline from the inner pipeline storage. 
+	/// 
+	/// *Attention: using the same pipeline again will panic, or give unexpected results*
 	pub fn delete_pipeline(&mut self, pipeline: GlPipeline) {
 		self.pipelines.delete_pipeline(pipeline);
 	}
 
+	/// Update the uniform of a loaded pipeline
 	pub fn set_uniform<T>(&mut self, pipeline: GlPipeline, name: &str, uniform: T) {
 		self.state.break_batching = true;
 
 		self.pipelines.get_pipeline_mut(pipeline).set_uniform(name, uniform);
 	}
 
+	/// Prepare material for a draw call. Basically the same as [`RenderingBackend::pipeline`] 
 	pub fn set_material(&mut self, material: &Material) {
 		self.pipeline(Some(material.pipeline));
 	}
 
+	/// Update the uniform of an already loaded material. The same as [`RenderingBackend::set_uniform`], but for materials
 	pub fn material_set_uniform<T>(&mut self, material: &Material, name: &str, uniform: T) {
 		self.set_uniform(material.pipeline, name, uniform);
 	}
 
+	/// Update the texture under specific name, in a specific pipeline. Useful in materials
 	pub fn set_texture(&mut self, pipeline: GlPipeline, name: &str, texture: TextureId) {
 		let pipeline = self.pipelines.get_pipeline_mut(pipeline);
 		pipeline
@@ -383,10 +398,14 @@ impl RenderingBackend {
 		*pipeline.textures_data.entry(name.to_owned()).or_insert(texture) = texture;
 	}
 
+	/// Update the texture under specific name, in a specific material. The same as [`RenderingBackend::set_texture`]
 	pub fn material_set_texture(&mut self, material: &Material, name: &str, texture: TextureId) {
 		self.set_texture(material.pipeline, name, texture);
 	}
 
+	/// Update the vertex/index limits of draw calls
+	/// 
+	/// *Note: It will resize all existing draw calls as well*
 	pub fn update_drawcall_capacity(&mut self, max_vertices: usize, max_indices: usize) {
 		self.max_vertices = max_vertices;
 		self.max_indices = max_indices;

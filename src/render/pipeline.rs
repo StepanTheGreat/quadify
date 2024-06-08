@@ -89,7 +89,6 @@ pub struct GlState {
 	pub break_batching: bool,
 
 	pub render_pass: Option<RenderPass>,
-	pub capture: bool,
 }
 
 impl Default for GlState {
@@ -104,7 +103,6 @@ impl Default for GlState {
 			break_batching: false,
 			depth_test_enable: false,
 			render_pass: None,
-			capture: false,
 		}
 	}
 }
