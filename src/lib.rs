@@ -4,6 +4,7 @@ pub mod prelude {
 	pub use crate::render::{camera::*, geometry::*, *};
 	pub use crate::window::{events::*, icon::*, state::*, *};
 	pub use crate::QuadifyPlugins;
+	pub use crate::render::RenderBackendPlugin;
 
 	pub use glam;
 	pub use miniquad;
@@ -18,8 +19,6 @@ pub(crate) mod io;
 pub(crate) mod render;
 pub(crate) mod window;
 
-use asset::AssetPlugin;
-use bevy_input::InputPlugin;
 // Create Default plugin bundle
 use bevy_app::{PluginGroup, PluginGroupBuilder};
 
@@ -29,10 +28,10 @@ impl PluginGroup for QuadifyPlugins {
 	fn build(self) -> PluginGroupBuilder {
 		#[allow(unused_mut)]
 		let mut builder = PluginGroupBuilder::start::<Self>()
-			.add(InputPlugin)
+			.add(bevy_input::InputPlugin)
 			.add(render::RenderBackendPlugin::default())
 			.add(window::WindowPlugin::default())
-			.add(AssetPlugin);
+			.add(asset::AssetPlugin);
 
 		#[cfg(feature = "log")]
 		{
