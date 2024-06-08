@@ -38,20 +38,20 @@ pub struct Mesh {
 
 impl Mesh {
 	/// Makes a simple quad mesh
-	fn quad(size: Vec2, color: Rgba) -> Self {
-		let indices = vec![0, 1, 2, 0, 2, 3];
+	fn quad(pos: Vec3, size: Vec2, color: Rgba) -> Self {
+		let indices = vec![0, 1, 2, 1, 2, 3];
 		let (hw, hh) = (size.x / 2.0, size.y / 2.0);
 		let vertices = vec![
-			Vertex::new(vec3(-hw, hh, 0.0), vec2(0.0, 0.0), color),  // top-left
-			Vertex::new(vec3(hw, hh, 0.0), vec2(1.0, 0.0), color),   // top-right
-			Vertex::new(vec3(-hw, -hh, 0.0), vec2(0.0, 1.0), color), // bottom-left
-			Vertex::new(vec3(hw, -hh, 0.0), vec2(1.0, 1.0), color),  // bottom-right
+			Vertex::new(vec3(pos.x-hw, pos.y+hh, pos.z), vec2(0.0, 0.0), color),  // top-left
+			Vertex::new(vec3(pos.x+hw, pos.y+hh, pos.z), vec2(1.0, 0.0), color),   // top-right
+			Vertex::new(vec3(pos.x-hw, pos.y-hh, pos.z), vec2(0.0, 1.0), color), // bottom-left
+			Vertex::new(vec3(pos.x+hw, pos.y-hh, pos.z), vec2(1.0, 1.0), color),  // bottom-right
 		];
 		Self { vertices, indices }
 	}
 
 	/// Makes a circle mesh, with a specified amount of points
-	fn circle(npoints: u32, r: f32, color: Rgba) -> Self {
+	fn circle(pos: Vec3, r: f32, npoints: u32, color: Rgba) -> Self {
 		debug_assert!(npoints >= 3, "Not enough points to represent a circle mesh. Minimum is 3");
 		let mut indices: Vec<u16> = vec![];
 		let mut vertices: Vec<Vertex> = vec![];
@@ -60,7 +60,7 @@ impl Mesh {
 		for i in 0..npoints {
 			let degrees = (i as f32) * circle_piece;
 			let (x, y) = (degrees.cos(), degrees.sin());
-			vertices.push(Vertex::new(vec3(x * r, y * r, 0.0), vec2(x, y), color));
+			vertices.push(Vertex::new(vec3(pos.x+x*r, pos.y+y*r, pos.z), vec2(x, y), color));
 
 			if i < npoints - 2 {
 				let i = i as u16;
@@ -68,6 +68,19 @@ impl Mesh {
 			}
 		}
 		Self { vertices, indices }
+	}
+
+	/// Colors the verticies of the mesh by the given [`Rgba`].
+	pub fn colored_as(mut self, color: Rgba) -> Self {
+		self.color_as(color);
+		self
+	}
+
+	/// Colors the verticies of the mesh in place by the given [`Rgba`].
+	pub fn color_as(&mut self, color: Rgba) {
+		for vert in self.vertices.iter_mut() {
+			vert.color = color;
+		}
 	}
 
 	/// Translates the vertex positions of the mesh by the given [`Vec3`].
@@ -124,6 +137,7 @@ enum MeshShape {
 pub struct MeshBuilder {
 	shape: Option<MeshShape>,
 	color: Option<Rgba>,
+	position: Option<Vec3>,
 	circle_points: u32,
 }
 
@@ -131,8 +145,9 @@ impl Default for MeshBuilder {
 	fn default() -> Self {
 		Self {
 			shape: None,
-			circle_points: 20,
 			color: None,
+			position: None,
+			circle_points: 20,
 		}
 	}
 }
@@ -160,6 +175,12 @@ impl MeshBuilder {
 		self
 	}
 
+	/// Sets the center position of the mesh (for both circles and quads). This method cannot be ignored.
+	pub fn at_position(&mut self, position: Vec3) -> &mut Self {
+		self.position = Some(position);
+		self
+	}
+
 	/// Sets the color of the mesh. If not set up - will use the default black color.
 	pub fn with_color(&mut self, color: Rgba) -> &mut Self {
 		self.color = Some(color);
@@ -171,11 +192,13 @@ impl MeshBuilder {
 	/// *Note: panics if the shape wasn't provided*
 	pub fn build(&mut self) -> Mesh {
 		debug_assert!(self.shape.is_some(), "Can't build a Mesh without shape parameter provided.");
-		// Should unwrap thanks to the previous `debug_assert`
+		debug_assert!(self.position.is_some(), "Can't build a Mesh without position parameter provided.");
+
 		let color = self.color.unwrap_or_default();
+		let pos = self.position.unwrap();
 		match self.shape.take().unwrap() {
-			MeshShape::Quad(size) => Mesh::quad(size, color),
-			MeshShape::Circle(r) => Mesh::circle(self.circle_points, r, color),
+			MeshShape::Quad(size) => Mesh::quad(pos, size, color),
+			MeshShape::Circle(r) => Mesh::circle(pos, r, self.circle_points, color),
 		}
 	}
 }
