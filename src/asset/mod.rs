@@ -1,8 +1,8 @@
 use bevy_app::Plugin;
-use bevy_asset::{AssetLoader, AssetPlugin as BevyAssetPlugin};
 use bevy_asset::{Asset, AssetApp, Assets};
+use bevy_asset::{AssetLoader, AssetPlugin as BevyAssetPlugin};
 use bevy_reflect::Reflect;
-use miniquad::{TextureId, ShaderSource, ShaderMeta};
+use miniquad::{ShaderMeta, ShaderSource, TextureId};
 
 use crate::prelude::material::Material;
 use crate::prelude::Mesh;
@@ -22,9 +22,7 @@ pub struct Texture {
 
 impl Texture {
 	pub fn new(texture: TextureId) -> Self {
-		Self {
-			texture: Some(texture)
-		}
+		Self { texture: Some(texture) }
 	}
 }
 

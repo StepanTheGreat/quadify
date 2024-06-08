@@ -5,8 +5,8 @@ use miniquad::*;
 
 use crate::render::GlPipeline;
 
-/// Material instance loaded on GPU. 
-/// 
+/// Material instance loaded on GPU.
+///
 /// Please use the [`RenderingBackend`] non-send resource to modify its data:
 /// - [`material_set_uniform`](RenderingBackend::material_set_uniform)
 /// - [`material_set_texture`](RenderingBackend::material_set_texture)
