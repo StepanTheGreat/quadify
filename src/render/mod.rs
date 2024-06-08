@@ -392,7 +392,7 @@ impl RenderingBackend {
 		self.max_indices = max_indices;
 
 		for draw_call in &mut self.draw_calls {
-			draw_call.vertices = vec![Vertex::new(vec3(0.0, 0.0, 0.0), vec2(0.0, 0.0)); max_vertices];
+			draw_call.vertices = vec![Vertex::new(vec3(0.0, 0.0, 0.0), vec2(0.0, 0.0), Rgba::default()); max_vertices];
 			draw_call.indices = vec![0; max_indices];
 		}
 		for binding in &mut self.draw_call_bindings {
@@ -442,9 +442,9 @@ impl bevy_app::Plugin for RenderBackendPlugin {
 }
 
 fn apply_clear_color(
-	mut render_ctx: NonSendMut<RenderingBackend>, 
-	clear_color: Res<ClearColor>, 
-	current_camera: Res<camera::CurrentCameraTag>, 
+	mut render_ctx: NonSendMut<RenderingBackend>,
+	clear_color: Res<ClearColor>,
+	current_camera: Res<camera::CurrentCameraTag>,
 	render_target: Query<&camera::RenderTarget>,
 	// renderables: Query<&Handle<Mesh>>
 ) {

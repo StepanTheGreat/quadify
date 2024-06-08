@@ -1,8 +1,9 @@
+use bevy_reflect::Reflect;
 use glam::{vec4, Vec4};
 
 /// RGBA color struct
 #[repr(C)]
-#[derive(Debug, Clone, Copy, PartialEq, Default)]
+#[derive(Debug, Clone, Copy, PartialEq, Reflect)]
 pub struct Rgba {
 	pub r: u8,
 	pub g: u8,
@@ -17,6 +18,13 @@ impl Rgba {
 
 	pub fn to_float(&self) -> Vec4 {
 		vec4((self.r as f32) / 255.0, (self.g as f32) / 255.0, (self.b as f32) / 255.0, (self.a as f32) / 255.0)
+	}
+}
+
+impl Default for Rgba {
+	fn default() -> Self {
+		// ? To not cause any alpha issues
+		Self { r: 0, g: 0, b: 0, a: 255 }
 	}
 }
 

@@ -1,4 +1,4 @@
-use super::geometry::Vertex;
+use super::{geometry::Vertex, rgba::Rgba};
 use bevy_reflect::Reflect;
 use glam::{vec2, vec3};
 use miniquad::*;
@@ -52,7 +52,7 @@ impl DrawCall {
 		max_indices: usize,
 	) -> DrawCall {
 		DrawCall {
-			vertices: vec![Vertex::new(vec3(0., 0., 0.), vec2(0., 0.)); max_vertices],
+			vertices: vec![Vertex::new(vec3(0.0, 0.0, 0.0), vec2(0.0, 0.0), Rgba::default()); max_vertices],
 			indices: vec![0; max_indices],
 			vertices_count: 0,
 			indices_count: 0,
@@ -314,6 +314,7 @@ pub(crate) mod shader {
 	pub const VERTEX: &str = r#"#version 100
 	attribute vec3 position;
 	attribute vec2 texcoord;
+	attribute vec4 color0;
 
 	varying lowp vec2 uv;
 	varying lowp vec4 color;
@@ -322,9 +323,9 @@ pub(crate) mod shader {
 	uniform mat4 Projection;
 
 	void main() {
-		 gl_Position = Projection * Model * vec4(position, 1);
-		 color = vec4(1.0, 0.0, 0.0, 1.0);
-		 uv = texcoord;
+		gl_Position = Projection * Model * vec4(position, 1);
+		color = color0 / 255.0;
+		uv = texcoord;
 	}"#;
 
 	pub const FRAGMENT: &str = r#"#version 100
@@ -334,7 +335,7 @@ pub(crate) mod shader {
 	uniform sampler2D Texture;
 
 	void main() {
-		 gl_FragColor = color * texture2D(Texture, uv) ;
+		gl_FragColor = color * texture2D(Texture, uv);
 	}"#;
 
 	pub const METAL: &str = r#"#include <metal_stdlib>
@@ -342,37 +343,38 @@ pub(crate) mod shader {
 
 	struct Uniforms
 	{
-		 float4x4 Model;
-		 float4x4 Projection;
+		float4x4 Model;
+		float4x4 Projection;
 	};
 
 	struct Vertex
 	{
-		 float3 position    [[attribute(0)]];
-		 float2 texcoord    [[attribute(1)]];
+		float3 position    [[attribute(0)]];
+		float2 texcoord    [[attribute(1)]];
+		float4 color0      [[attribute(2)]];
 	};
 
 	struct RasterizerData
 	{
-		 float4 position [[position]];
-		 float4 color [[user(locn0)]];
-		 float2 uv [[user(locn1)]];
+		float4 position [[position]];
+		float4 color [[user(locn0)]];
+		float2 uv [[user(locn1)]];
 	};
 
 	vertex RasterizerData vertexShader(Vertex v [[stage_in]], constant Uniforms& uniforms [[buffer(0)]])
 	{
-		 RasterizerData out;
+		RasterizerData out;
 
-		 out.position = uniforms.Model * uniforms.Projection * float4(v.position, 1);
-		 out.color = float4(1.0, 0.0, 0.0, 1.0);
-		 out.uv = v.texcoord;
+		out.position = uniforms.Model * uniforms.Projection * float4(v.position, 1);
+		out.color = v.color0 / 255.0;
+		out.uv = v.texcoord;
 
-		 return out;
+		return out;
 	}
 
 	fragment float4 fragmentShader(RasterizerData in [[stage_in]], texture2d<float> tex [[texture(0)]], sampler texSmplr [[sampler(0)]])
 	{
-		 return in.color * tex.sample(texSmplr, in.uv);
+		return in.color * tex.sample(texSmplr, in.uv);
 	}
 	"#;
 

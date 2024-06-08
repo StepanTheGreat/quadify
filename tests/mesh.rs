@@ -5,6 +5,7 @@ use bevy_asset::{Assets, Handle};
 use bevy_ecs::prelude::*;
 use bevy_input::mouse::MouseButtonInput;
 use glam::Mat4;
+use quadify::color::{Rgba, RED};
 use quadify::prelude::geometry::{Mesh, MeshBuilder};
 use quadify::prelude::RenderingBackend;
 use quadify::prelude::WindowPlugin;
@@ -35,7 +36,7 @@ fn main() {
 
 fn setup_render_state(mut commands: Commands, mut meshes: ResMut<Assets<Mesh>>) {
 	commands.insert_resource(MeshHandle {
-		mesh: meshes.add(MeshBuilder::default().as_circle(0.2).circle_points(3).build()),
+		mesh: meshes.add(MeshBuilder::default().as_circle(0.2).circle_points(3).with_color(RED).build()),
 		parts_count: 3,
 	});
 }
@@ -44,7 +45,7 @@ fn change_on_click(mut mesh: ResMut<MeshHandle>, mut click: EventReader<MouseBut
 	for event in click.read() {
 		if event.state.is_pressed() {
 			mesh.parts_count = ((mesh.parts_count + 1) % 64).max(4);
-			meshes.insert(&mesh.mesh, MeshBuilder::default().as_circle(0.2).circle_points(mesh.parts_count).build());
+			meshes.insert(&mesh.mesh, MeshBuilder::default().as_circle(0.2).circle_points(mesh.parts_count).with_color(RED).build());
 		}
 	}
 }
