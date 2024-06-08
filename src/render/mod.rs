@@ -153,7 +153,6 @@ impl RenderingBackend {
 			self.draw_call_bindings.push(bindings);
 		}
 		assert_eq!(self.draw_call_bindings.len(), self.draw_calls.len());
-		dbg!(self.draw_calls.len());
 
 		let (screen_width, screen_height) = miniquad::window::screen_size();
 		let time = (miniquad::date::now() - self.start_time) as f32;
